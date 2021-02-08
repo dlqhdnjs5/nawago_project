@@ -134,6 +134,11 @@ const routes = [
 				component : () => import('../components/detail/UserDetail.vue')
 			},
 			{
+				path: '/abandonedPet',
+				name : 'abandonedPet',
+				component : () => import('../components/abandoned/AbandonedPet.vue')
+			},
+			{
 				path: '/pet/:userId/:petSeq',
 				name : 'pet',
 				component : () => import('../components/pet/PetDetail.vue')

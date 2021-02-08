@@ -99,7 +99,7 @@
 	    >
 	      <v-btn icon  color="#00BFA5"
 	       @click="$router.push({name : 'showOffList'})">
-	        <v-icon>mdi-paw</v-icon>
+	        <v-icon>mdi-history</v-icon><!-- <v-icon>mdi-paw</v-icon> -->
 	      </v-btn>
 	
 	      <v-btn icon  color="#F48FB1">
@@ -111,8 +111,12 @@
 	        <v-icon>mdi-plus-box-outline</v-icon>
 	      </v-btn>
 	
-	      <v-btn icon  color="#00BFA5">
-	        <v-icon>mdi-map-marker</v-icon>
+	      <v-btn icon  color="#00BFA5"
+	      	@click="$router.push({
+	      		name : 'abandonedPet'
+	      	})"
+	      >
+	        <v-icon>mdi-paw</v-icon>
 	      </v-btn>
 	      <v-btn 
 	      icon

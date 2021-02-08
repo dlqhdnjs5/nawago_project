@@ -91,9 +91,7 @@ export default {
     	
     	axios.post('/loginProcesse', params )
     	.then(function(resp){
-    		console.log(resp);
     		localStorage.setItem('x-auth', resp.data);
-    		console.log('what');
     		that.roturtest();
     	})
     	.catch(function(error){

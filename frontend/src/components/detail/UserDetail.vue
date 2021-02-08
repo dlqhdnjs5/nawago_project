@@ -228,12 +228,12 @@
 				</v-card>
 			</v-flex>
 		</v-layout>
-		<div>
+		<div class="text-center">
 			<v-layout v-if="loading" xs12 sm12 md12 lg12 xl12 class="text-center">
 				<v-flex>
 					<v-progress-circular
 				      indeterminate
-				      color="primary"
+				      color="#00BFA5"
 				    ></v-progress-circular>
 				</v-flex>
 			</v-layout>
