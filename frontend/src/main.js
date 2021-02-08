@@ -25,9 +25,9 @@ Vue.use(VueMoment)
 new Vue({
   directives: {InfiniteLoading},
   getAuthAxios,
-  beforeCreate(){
+ /* beforeCreate(){
 	this.$store.commit('getPublicMbrInfo')
-  },
+  },*/
   axios,
   vuetify,
   store,

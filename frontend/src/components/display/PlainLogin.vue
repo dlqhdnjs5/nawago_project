@@ -8,12 +8,14 @@
 				lazy-validation
 				>
 	 			<v-text-field
+	 				color="#00BFA5"
 	 				v-model="email"
 	 				label ="이메일"
 	 				:rules="emailRule"
 	 			>
 	 			</v-text-field>
 	 			<v-text-field
+	 				color="#00BFA5"
 	 				v-model="password"
 	 				type="password"
 	 				label ="패스워드"
@@ -21,13 +23,13 @@
 	 			>
 	 			</v-text-field>
 	 			
-	 			<v-btn block large depressed color="primary"
+	 			<v-btn block large depressed dark color="#00BFA5"
 	 				@click="loginProccese">
 	 				로그인
 	 			</v-btn>
 	 			</v-form>
 	 			<br>
-	 			<v-btn block large depressed color="primary"
+	 			<v-btn block large depressed dark color="#F48FB1"
 	 			@click="$router.push({
 	 			name : 'RegisterPage'
 	 			})"

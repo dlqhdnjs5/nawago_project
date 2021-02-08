@@ -1,10 +1,10 @@
 <template>
 	<div class="overflow-hidden" >
-		<v-app-bar fixed dense app>
+		<v-app-bar fixed dense app >
 		<v-btn icon @click="back">
 			<v-icon>mdi-arrow-left</v-icon>
 		</v-btn> 
-		  <v-toolbar-title @click="$router.push({name : 'showOffList'})">NawaGo</v-toolbar-title>
+		  <v-toolbar-title style="color:#00BFA5;" @click="$router.push({name : 'showOffList'})">NawaGo</v-toolbar-title>
 		  <v-spacer></v-spacer>
 		  <v-toolbar-items class="hidden-sm-and-down">
 		  </v-toolbar-items>
@@ -97,26 +97,27 @@
 	      scroll-target="#scroll-area-1"
      	  hide-on-scroll
 	    >
-	      <v-btn text color="deep-purple accent-1"
+	      <v-btn icon  color="#00BFA5"
 	       @click="$router.push({name : 'showOffList'})">
 	        <v-icon>mdi-paw</v-icon>
 	      </v-btn>
 	
-	      <v-btn text color="deep-purple accent-4">
+	      <v-btn icon  color="#F48FB1">
 	        <v-icon>mdi-heart</v-icon>
 	      </v-btn>
 	      
-	      <v-btn text color="deep-purple accent-4"
+	      <v-btn icon  color="#00BFA5"
 	       @click="$router.push({name : 'AddShowOff'})">
 	        <v-icon>mdi-plus-box-outline</v-icon>
 	      </v-btn>
 	
-	      <v-btn text color="deep-purple accent-4">
+	      <v-btn icon  color="#00BFA5">
 	        <v-icon>mdi-map-marker</v-icon>
 	      </v-btn>
 	      <v-btn 
-	      text color="deep-purple accent-4" 
-	      @click="$router.push({name : 'myPage'})">
+	      icon
+	       color="#00BFA5" 
+	      @click="goMyPage(isLogin)">
 	        <v-icon>mdi-account</v-icon>
 	      </v-btn>
 	    </v-bottom-navigation>
@@ -142,6 +143,9 @@ export default {
 	  drawer : null,
 	  myInfo : {},
   }),
+  beforeCreate(){
+	this.$store.commit('getPublicMbrInfo')
+  },
   created : function(){
 	  var that = this;
   },
@@ -149,7 +153,6 @@ export default {
 	...mapGetters({
 		mbrInfo : 'getMbrInfo',
 		isLogin : 'getIsLogin',
-		userId  : 'getMbrId'
 	})
 	
   },
@@ -166,6 +169,16 @@ export default {
 	  back : function(){
 		  this.$router.go(-1);
 	  },
+	  goMyPage : function(isLoginParam){
+		  var that = this;
+		  if(!isLoginParam){
+			  alert('로그인이 필요한 화면입니다.\n로그인 페이지로 이동합니다.');
+			  that.$router.push({name: 'plainLogin'});
+		  }else{
+			  var loginId = that.$store.getters.getMbrId;
+			  that.$router.push({path: '/user/'+loginId});
+		  }
+	  }
 	  
   },
   mounted : function() {

@@ -3,7 +3,7 @@
 		<v-layout row wrap class="text-center">
 			<v-flex xs12  >
 				<v-badge
-		            icon="mdi-camera-flip"
+		            icon="mdi-emoticon"
 			        bordered
 			        bottom
 			        overlap
@@ -183,20 +183,20 @@
 					</v-card-subtitle>
 				
 					<v-card-text class="text--primary"
-						v-html="myShowOffObj.showOffCont"
+						v-html="getShoOffCont(myShowOffObj.showOffCont)"
 					>
 					</v-card-text>
 				
 					<v-card-actions>
 						<v-btn
-					        color="deep-purple accent-4"
 					        icon
+					        color="#F48FB1"
 						>
 							<v-icon>mdi-heart-outline</v-icon>	<!-- mdi-bone -->
 						</v-btn>
 						<v-btn
-					        color="deep-purple accent-4"
 					        icon
+					        color="#00BFA5"
 					        @click="replySheet = !replySheet; openReply(myShowOffObj.showOffSeq);"
 						>
 							<v-icon>mdi-chat-outline</v-icon>	
@@ -220,13 +220,25 @@
 		    <v-bottom-sheet v-model="sheet">
 		      <v-list>
 		        <v-subheader>프로필</v-subheader>
+		        <v-list-item 
+		          @click="sheet = false; updateMbr();"
+		        >
+		          <v-list-item-avatar>
+			            <v-avatar color="#00BFA5">
+					      <v-icon dark>
+					        mdi-account-convert
+					      </v-icon>
+					    </v-avatar>
+		          </v-list-item-avatar>
+		          <v-list-item-title>회원 정보 바꾸기</v-list-item-title>
+		        </v-list-item>
 		        <v-list-item
 		          @click="sheet = false; fileClick();"
 		        >
 		          <v-list-item-avatar>
-			            <v-avatar color="indigo">
+			            <v-avatar color="#00BFA5">
 					      <v-icon dark>
-					        mdi-account-convert
+					        mdi-camera
 					      </v-icon>
 					    </v-avatar>
 		          </v-list-item-avatar>
@@ -236,9 +248,9 @@
 		          @click="sheet = false ; updateProfilePhoto('');"
 		        >
 		          <v-list-item-avatar>
-		            <v-avatar color="indigo">
+		            <v-avatar color="#F48FB1">
 				      <v-icon dark>
-				        mdi-account-off
+				       mdi-camera-off
 				      </v-icon>
 				    </v-avatar>
 		          </v-list-item-avatar>
@@ -281,12 +293,14 @@
 				<v-layout style="padding-left:7%">
 					<v-flex row wrap>
 							<v-avatar size="38">
-						      <img v-if="myInfo != null"
+							<template v-if="myInfo != null">
+						      <img  v-if="myInfo.mbrRpstImgUrl != null && myInfo.mbrRpstImgNm != null"
 					      		:src="myInfo.mbrRpstImgUrl +'/'+  myInfo.mbrRpstImgNm "
 					      	  >
 					      	  <img v-else
 					      		src="@/assets/emptyProfile2.png"
 					      	  >
+					      	</template>
 						    </v-avatar>
 							<v-text-field v-if="$store.getters.getIsLogin"
 								label="댓글달기"
@@ -351,7 +365,7 @@
 			</v-sheet>
 		</v-bottom-sheet>
 	</div>
-	<v-speed-dial
+	<!-- <v-speed-dial
       v-model="fab"
       :bottom="true"
       :right="true"
@@ -402,7 +416,7 @@
       >
         <v-icon>mdi-delete</v-icon>
       </v-btn>
-    </v-speed-dial>
+    </v-speed-dial> -->
 </div>
   
 </template>
@@ -784,6 +798,9 @@ import store from '@/store/store'
    				console.log(err);
    			});
    		},
+   		getShoOffCont : function(shoOffCont){
+			return shoOffCont.replaceAll('\n','</br>');
+   		}
     }
   }
 </script>

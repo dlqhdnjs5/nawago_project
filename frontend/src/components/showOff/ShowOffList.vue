@@ -47,18 +47,18 @@
 					      height="295"
 				    ></v-img>
 			    </template>
-			    <v-card-text v-html="showOffObj.showOffCont">
+			    <v-card-text v-html="getShoOffCont(showOffObj.showOffCont)">
 			    </v-card-text>
 			
 			    <v-card-actions>
 			      <v-btn
-			        color="deep-purple accent-4"
+			         color="#F48FB1"
 			        icon
 			      >
 			        <v-icon>mdi-heart-outline</v-icon>	<!-- mdi-bone -->
 			      </v-btn>
 			      <v-btn
-			        color="deep-purple accent-4"
+			       color="#00BFA5"
 			        icon
 			        @click="sheet = !sheet; openReply(showOffObj.showOffSeq);"
 			      >
@@ -113,12 +113,14 @@
 				<v-layout style="padding-left:7%">
 					<v-flex row wrap>
 							<v-avatar size="38">
-						      <img v-if="mbrInfo != null"
+							<template v-if="mbrInfo != null">
+								<img v-if="mbrInfo.mbrRpstImgUrl != null && mbrInfo.mbrRpstImgNm != null"
 					      		:src="mbrInfo.mbrRpstImgUrl +'/'+  mbrInfo.mbrRpstImgNm "
-					      	  >
-					      	  <img v-else
-					      		src="@/assets/emptyProfile2.png"
-					      	  >
+						      	>
+						      	<img v-else
+						      		src="@/assets/emptyProfile2.png"
+						      	>
+							</template>
 						    </v-avatar>
 							<v-text-field v-if="isLogin"
 								label="댓글달기"
@@ -427,6 +429,9 @@ import {mapGetters , mapActions} from 'vuex'
            var minutes = d.getMinutes()
            var seconds = d.getSeconds()
            return year+'-'+month + '-' + day  +   ' ' + hour + ':' + minutes + ':' + seconds;    
+   		},
+   		getShoOffCont : function(shoOffCont){
+			return shoOffCont.replaceAll('\n','</br>');
    		}
    		
    	}

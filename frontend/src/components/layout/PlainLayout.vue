@@ -1,11 +1,11 @@
 <template>
 	 <v-app>
 	
-		<v-app-bar fixed dense app>
+		<v-app-bar fixed dense app >
 		<v-btn icon @click="back">
 			<v-icon>mdi-arrow-left</v-icon>
 		</v-btn> 
-		<v-toolbar-title @click="$router.push({name : 'showOffList'})">NawaGo</v-toolbar-title>
+		<v-toolbar-title style="color:#F48FB1;" @click="$router.push({name : 'showOffList'})">NawaGo</v-toolbar-title>
 		<v-spacer></v-spacer>
 		<v-toolbar-items class="hidden-sm-and-down">
 		</v-toolbar-items>

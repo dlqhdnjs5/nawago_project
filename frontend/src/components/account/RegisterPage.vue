@@ -9,38 +9,44 @@
 			  >
 	 			<v-text-field
 	 				v-model="mbrId"
+	 				color="#00BFA5"
 	 				id="mbrId"
 	 				:rules="mbrIdRules"
 	 				label ="*아이디">
 	 			</v-text-field>
 	 			<v-text-field
 	 				v-model="password"
+	 				color="#00BFA5"
 	 				type="password"
 	 				:rules="passwordRules"
 	 				label ="*패스워드">
 	 			</v-text-field>
 	 			<v-text-field
 	 				v-model="passwordConfirm"
+	 				color="#00BFA5"
 	 				type="password"
 	 				:rules="passwordCfRules"
 	 				label ="*패스워드 확인">
 	 			</v-text-field>
 	 			<v-text-field
 	 				v-model="nickname"
+	 				color="#00BFA5"
 	 				:rules = "nicknameRules"
 	 				label ="*닉네임">
 	 			</v-text-field>
 	 			<v-text-field
 	 				v-model="mbrEmail"
+	 				color="#00BFA5"
 	 				:rules ="mbrEmailRules"
 	 				label ="*이메일">
 	 			</v-text-field>
 	 			<v-text-field
 	 				v-model="name"
+	 				color="#00BFA5"
 	 				:rules ="nameRules"
 	 				label ="이름">
 	 			</v-text-field>
-	 			<v-btn block  depressed color="primary"
+	 			<v-btn block  depressed color="#00BFA5" dark
 	 			:disabled="!valid"
 	 			@click="joinMbr"
 	 				>
@@ -100,7 +106,7 @@ import router from '@/router/index.js'
 			  ],
 		   nicknameRules: [
 		        value => !!value || '닉네임을 입력해주세요.',
-		        value => (value && value.length  <= 8) || '닉네임은 최대 8자까지 입력 가능합니다.',
+		        value => (value && value.length  <= 8) || '닉네임은 최대 13자까지 입력 가능합니다.',
 		        value => (value && value.length  >= 2) || '닉네임을 최소 2자이상 입력해주세요.',
 		        value => (this.checkEx(value)) || '특수문자나 공백을 제외하고 입력해 주세요.'
 		      ],
