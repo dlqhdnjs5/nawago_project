@@ -1,73 +1,89 @@
 <template>
-	<div>
-	<v-container class="text-center" style="max-width:100%"> 
-	 	<v-layout align-center >
-	 		<v-flex xs12 lg12 md12 xl12  >
+	<v-container >
+	<div class="text-center">
+	 	<!-- <v-layout> -->
+	 		<!-- <v-flex xs12 lg12 md12 xl12  > -->
 	 		<v-form
 			    ref="form"
 			    v-model="valid"
 			    lazy-validation
 			  >
-			<v-badge
-		            icon="mdi-camera-flip"
-			        bordered
-			        bottom
-			        overlap
-			        offset-x="30"
-        			offset-y="20"
-			        color="#00BFA5"
-		    >
-		 		<v-avatar size="89">
-				      <img v-if="(petImgUrl == null  && petImgNm == null ) || ( petImgNm == '' && petImgUrl == '') "
-				        src="@/assets/emptyPetProfile.png"
-				        @click="sheet = !sheet"
-				      >
-				      <img v-else
-				        :src="petImgUrl + '/' + petImgNm"
-				        @click="sheet = !sheet"
-				      >
-				</v-avatar>
-			</v-badge>
-			<input id="fileId" type="file"	@input="upload" style="display : none;"/>
-	 		<v-text-field
- 				v-model="petNm"
- 				id="petNm"
- 				:rules="petNmRules"
- 				color="green lighten-1"
- 				label ="*이름">
-	 		</v-text-field>
-	 		<v-radio-group
-              v-model="petSex"
-              row
-            >
-	 		 <v-radio
-                label="여자"
-                color="pink"
-                value="FEMALE"
-              ></v-radio>
-              <v-radio
-                label="남자"
-                color="blue"
-                value="MALE"
-              ></v-radio>
-            
-             </v-radio-group>
+			<v-layout >
+				<v-flex xs12 lg12 md12 xl12>
+				
+					<v-badge
+				            icon="mdi-camera-flip"
+					        bordered
+					        bottom
+					        overlap
+					        offset-x="30"
+		        			offset-y="20"
+					        color="#00BFA5"
+				    >
+				 		<v-avatar size="89">
+						      <img v-if="(petImgUrl == null  && petImgNm == null ) || ( petImgNm == '' && petImgUrl == '') "
+						        src="@/assets/emptyPetProfile.png"
+						        @click="sheet = !sheet"
+						      >
+						      <img v-else
+						        :src="petImgUrl + '/' + petImgNm"
+						        @click="sheet = !sheet"
+						      >
+						</v-avatar>
+					</v-badge>
+					<input id="fileId" type="file"	@input="upload" style="display : none;"/>
+				</v-flex>
+			</v-layout>
+			<v-layout >
+				<v-flex >
+			 		<v-text-field
+		 				v-model="petNm"
+		 				id="petNm"
+		 				:rules="petNmRules"
+		 				color="#00BFA5"
+		 				label ="*이름">
+			 		</v-text-field>
+		 		</v-flex>
+	 		</v-layout>
+	 		<v-layout >
+				<v-flex xs12 lg12 md12 xl12 >
+			 		<v-radio-group
+		              v-model="petSex"
+		              row
+		            >
+			 		 <v-radio
+		                label="여자"
+		                color="#F48FB1"
+		                value="FEMALE"
+		              ></v-radio>
+		              <v-radio
+		                label="남자"
+		                color="#81D4FA"
+		                value="MALE"
+		              ></v-radio>
+		            
+		             </v-radio-group>
+				</v-flex>	
+	          </v-layout>
              </br>
-             <span >*성격</span>
-             <div v-if="isCharErr" class=" theme--light error--text caption" style="color:red;">
-             	<span>성격을 선택해주세요</span>
+             <v-layout>
+             	<span>*성향</span>
+             </v-layout>
+              <div v-if="isCharErr" class=" theme--light error--text caption" style="color:red;">
+             	<span>성향을 선택해주세요</span>
              </div>
+            
              </br>
              <v-chip-group v-if="petCharChipList != null"
 		        v-model="petChar"
-		        active-class="green--text"
+		        active-class="#F48FB1"
 		        column
 		        multiple
 		      >
 		        <v-chip v-for="petCharChip in petCharChipList"
 		          :key="petCharChip.cd"
-		          color="green" 
-		          text-color="green"
+		          color="#F48FB1" 
+		          text-color="#F48FB1"
 		          filter
 		          outlined
 		          
@@ -79,31 +95,40 @@
 	 		<v-switch
               v-model="petBirthYn"
               label="생년월일 사용"
-              color="green"
+              color="#00BFA5"
               hide-details
             ></v-switch>
 		 	</br>
 	        <v-row justify="space-around">
 		        <v-date-picker v-if="petBirthYn"
 			      v-model="petBirth"
-			      color="green lighten-1"
+			      color="#00BFA5"
 			    ></v-date-picker>
 		    </v-row>
 	 		<v-textarea
 	          outline
+	          color="#00BFA5"
 	          v-model="petIntro"
 	          :rules="petIntroRules"
 	          label="*소개글을 남겨주세요!"
 	        ></v-textarea>
-	 		<v-btn
-	 		@click="registPet">
-	 			등록
-	 		</v-btn>
+	        <v-btn
+		      class="mx-2"
+		      fab
+		      dark
+		      large
+		      color="#00BFA5"
+		      :disabled="!valid"
+		      @click="registPet"
+		    >
+		      <v-icon dark>
+		        mdi-check-bold
+		      </v-icon>
+		    </v-btn>
 	 		</v-form>
 	      	<!-- <p>File Name : {{ files.name }}</p> -->
-	 		</v-flex>
-	 	</v-layout>
-	 </v-container>
+	 		<!-- </v-flex> -->
+	 	<!-- </v-layout> -->
 
 		<div class="text-center">
 		    <v-bottom-sheet v-model="sheet">
@@ -113,7 +138,7 @@
 		          @click="sheet = false; fileClick();"
 		        >
 		          <v-list-item-avatar>
-			            <v-avatar color="indigo">
+			            <v-avatar color="#00BFA5">
 					      <v-icon dark>
 					        mdi-cat
 					      </v-icon>
@@ -125,7 +150,7 @@
 		          @click="sheet = false ; delPetImg();"
 		        >
 		          <v-list-item-avatar>
-		            <v-avatar color="indigo">
+		            <v-avatar color="#F48FB1">
 				      <v-icon dark>
 				        mdi-close-thick
 				      </v-icon>
@@ -137,6 +162,7 @@
 		    </v-bottom-sheet>
 		</div>
 	</div>
+	</v-container>
 </template>
 
 <script>
@@ -297,7 +323,6 @@ import {getFilExtCommon , ImgfileSizeCheckCommon} from '@/common/nawagoCommonJs'
 			},
 			checkPetChar : function(){
 				var that = this;
-				console.log(that.petChar.length)
 				if(that.petChar.length < 1){
 					that.isCharErr = true;
 					return false;
