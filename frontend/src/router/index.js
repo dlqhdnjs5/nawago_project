@@ -8,6 +8,7 @@ Vue.use(VueRouter)
 function getAuthInfo(callbackFunc) {
 	
 	var that = this;
+	
 	return new Promise(function(resolve,reject){
 		var xAxios = getAuthAxios();
 		xAxios.get('/api/validAuth')
@@ -99,7 +100,7 @@ const routes = [
 				
 			},
 			{
-				path : '/myPage/:userId',
+				path : '/myPage',
 				name : 'myPage',
 				beforeEnter : onlyAuth,
 				component : () => import('../components/myPage/myPage.vue')
@@ -112,6 +113,7 @@ const routes = [
 			{
 				path: '/addShowOff',
 				name : 'AddShowOff',
+				beforeEnter : onlyAuth,
 				component : () => import('../components/showOff/AddShowOff.vue')
 			},
 			{
@@ -119,6 +121,22 @@ const routes = [
 				name : 'updateMember',
 				beforeEnter : onlyAuth,
 				component : () => import('../components/myPage/UpdateMember.vue')
+			},
+			{
+				path: '/updatePet',
+				name : 'updatePet',
+				beforeEnter : onlyAuth,
+				component : () => import('../components/pet/UpdatePet.vue')
+			},
+			{
+				path: '/user/:userId',
+				name : 'userDetail',
+				component : () => import('../components/detail/UserDetail.vue')
+			},
+			{
+				path: '/pet/:userId/:petSeq',
+				name : 'pet',
+				component : () => import('../components/pet/PetDetail.vue')
 			},
 		]
 	},

@@ -9,6 +9,8 @@ import {getAuthAxios} from '@/interceptor/axiosInterceptor'
 import VueAwesomeSwiper from 'vue-awesome-swiper'
 import "swiper/swiper-bundle.min.css"
 import InfiniteLoading from 'vue-infinite-loading';
+import VueMoment from 'vue-moment'
+
 
 Vue.config.productionTip = false
 
@@ -18,19 +20,13 @@ Vue.use(store)
 Vue.use(vuetify)
 Vue.use(VueAwesomeSwiper)
 Vue.use(InfiniteLoading)
+Vue.use(VueMoment)
 
 new Vue({
   directives: {InfiniteLoading},
   getAuthAxios,
   beforeCreate(){
-	console.log('beforeCreated')
 	this.$store.commit('getPublicMbrInfo')
-	/*.then(function(resp){
-		console.log('beforeCreated resp : ',err)
-	})
-	.catch(function(err){
-		console.log('beforeCreated err : ',err)
-	})*/
   },
   axios,
   vuetify,

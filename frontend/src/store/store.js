@@ -38,7 +38,10 @@ export default new Vuex.Store({
 		},
 		getMbrId : function(state){
 			return state.mbrInfo.mbrId;
-		}
+		},
+		getMbrSeq : function(state){
+			return state.mbrInfo.mbrSeq;
+		},
 	},
 	mutations : {
 		loginSuccess : (state) => {
@@ -62,7 +65,6 @@ export default new Vuex.Store({
 			state.mbrInfo = mbrInfoResult;
 		},
 		getPublicMbrInfo : function(state){
-			console.log('getPublicMbrInfo')
 			return new Promise(function(resolve, reject) {
 				var token = localStorage.getItem('x-auth');
 				var mbrInfoResult = {};
@@ -70,32 +72,20 @@ export default new Vuex.Store({
 					var newAxios = getAuthAxios();
 					newAxios.get('/api/getMbrInfo')
 					.then(resp =>{
+						
 						mbrInfoResult = resp.data;
 						state.mbrInfo = mbrInfoResult;
 						state.isLogin = true;
 						state.isLoginError = false;
-						
-						/*state.mbrInfo.mbrSeq 		= mbrInfoResult.mbrSeq,
-						state.mbrInfo.mbrEmail 		= mbrInfoResult.mbrEmail,
-						state.mbrInfo.mbrGrdCd 		= mbrInfoResult.mbrGrdCd,
-						state.mbrInfo.mbrId 		= mbrInfoResult.mbrId,
-						state.mbrInfo.mbrMobileNo 	= mbrInfoResult.mbrMobileNo,
-						state.mbrInfo.mbrNm 		= mbrInfoResult.mbrNm,
-						state.mbrInfo.mbrTpCd 		= mbrInfoResult.mbrTpCd,
-						state.mbrInfo.mbrNickNm 		= mbrInfoResult.mbrNickNm,
-						state.mbrInfo.mbrRpstImgUrl 		= mbrInfoResult.mbrRpstImgUrl,
-						state.mbrInfo.mbrRpstImgNm 		= mbrInfoResult.mbrRpstImgNm,*/
-						//state.mbrInfo.mbrTpCd 		= mbrInfoResult.mbrTpCd,
-						
-						
 						resolve(state.mbrInfo);
+						
 					})
 					.catch(err => {
 						state.isLogin = false;
 						state.isLoginError = true;
 						state.mbrInfo = null;
 						localStorage.removeItem("x-auth");
-						console.log('loginError')
+						console.log('anonymous')
 						console.log(err)
 					})
 				}else{
@@ -103,7 +93,7 @@ export default new Vuex.Store({
 					state.isLoginError = true;
 					state.mbrInfo = null;
 					localStorage.removeItem("x-auth");
-					console.log('loginError')
+					console.log('anonymous')
 				}
 			})
 		}
@@ -162,7 +152,7 @@ export default new Vuex.Store({
 					commit('loginSuccess');
 				})
 				.catch(err => {
-					alert('로그인중 시스템 오류가 발생하였습니다.\n 로그인 페이지로 이동합니다.2');
+					alert('로그인중 시스템 오류가 발생하였습니다.\n 로그인 페이지로 이동합니다.');
 					commit('loginError');
 					router.push('/plain/login');
 				});
@@ -187,7 +177,7 @@ export default new Vuex.Store({
 						router.push('/plain/login');
 					})
 				}else{
-					alert('로그인이 필요합니다. 로그인 페이지로 이동합니다.');
+					alert('로그인이 필요한 화면입니다.\n로그인 페이지로 이동합니다.');
 					commit('loginError');
 					router.push('/plain/login');
 				}
@@ -203,6 +193,19 @@ export default new Vuex.Store({
 				  })
 				  .catch(function(err){
 					  reject(err);
+				  });
+			})
+		},
+		getValidAuth2: function(commit) {
+			
+			return new Promise(function(resolve,reject){
+				var xAxios = getAuthAxios();
+				xAxios.get('/api/validAuth2')
+				.then(function(resp){
+					resolve(resp.data);
+				  })
+				  .catch(function(err){
+					  reject(err.data);
 				  });
 			})
 		},

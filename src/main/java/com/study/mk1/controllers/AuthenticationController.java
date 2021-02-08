@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.study.mk1.common.IOService;
 import com.study.mk1.common.JwtTokenProvider;
@@ -50,5 +51,25 @@ public class AuthenticationController {
 		}
 		
 	}
+	
+	@GetMapping(value= {"/validAuth2"})
+	@ResponseBody
+	public boolean validAuth2(HttpServletRequest request , HttpServletResponse response) throws Exception {
+		
+		try {
+			String token = jwtTokenProvider.resolveToken((HttpServletRequest) request);		
+			if (token != null && jwtTokenProvider.validateToken(token))  {
+				return true;
+			}else {
+				return false;
+			}
+		}catch(Exception e) {
+			throw new Exception(e);
+		}
+		
+		
+	}
+	
+	
 
 }

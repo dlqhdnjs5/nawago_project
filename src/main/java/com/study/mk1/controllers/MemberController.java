@@ -2,8 +2,10 @@ package com.study.mk1.controllers;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,8 +31,13 @@ import com.study.mk1.common.JwtTokenProvider;
 import com.study.mk1.common.S3service;
 import com.study.mk1.common.XSSUtill;
 import com.study.mk1.data.MbrInfoDTO;
+import com.study.mk1.data.MbrInfoResult;
 import com.study.mk1.data.PetInfoDTO;
 import com.study.mk1.jpa.mbr.MbrJpa;
+import com.study.mk1.jpa.mbr.MbrJpaCustomRepository;
+import com.study.mk1.jpa.mbr.MbrJpaRepository;
+import com.study.mk1.jpa.mbrPetMapping.MbrPetMappingJpa;
+import com.study.mk1.jpa.pet.PetJpa;
 
 @Controller
 @RequestMapping("/api/member")
@@ -44,6 +51,12 @@ public class MemberController {
 	
 	@Autowired
 	JwtTokenProvider jwtTokenProvider;
+	
+	@Autowired
+	MbrJpaCustomRepository mbrJpaCustomRepository;
+	
+	@Autowired
+	MbrJpaRepository mbrJpaRepository;
 	
 	@Autowired
 	MbrComponent mbrComponent;
@@ -134,6 +147,34 @@ public class MemberController {
 			mbrInfoDTO.setMbrNm(XSSUtill.stripXSS(mbrInfoDTO.getMbrNm()));
 			mbrComponent.updateMbr(mbrInfoDTO);
 			return new ResponseEntity<>( HttpStatus.OK);
+			
+		}catch(Exception e) {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+	}
+	
+	@GetMapping("/getUserInfo")
+	public ResponseEntity<MbrInfoResult> getUserInfo(HttpServletRequest req,HttpServletResponse res,@RequestParam(value="userId") String userId) throws Exception {
+		
+		try {
+			
+			
+			
+			MbrJpa mbrJpa = mbrJpaCustomRepository.findByMbrId(userId);
+			if(mbrJpa == null) {
+				return new ResponseEntity<>(null, HttpStatus.OK);
+			}
+			List<MbrPetMappingJpa> list = mbrJpa.getMbrPetMappingJpa();
+			List<PetJpa> pet = new ArrayList<>();
+			for(MbrPetMappingJpa obj  :  list) {
+				pet.add(obj.getPetJpa());
+			}
+			MbrInfoResult reulstList = new MbrInfoResult();
+			reulstList.setMbrJpa(mbrJpa);
+			reulstList.setPetJpaList(pet);
+			
+			return new ResponseEntity<MbrInfoResult>(reulstList, HttpStatus.OK);
 			
 		}catch(Exception e) {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

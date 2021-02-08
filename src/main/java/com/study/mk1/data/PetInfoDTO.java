@@ -12,4 +12,10 @@ public class PetInfoDTO extends AbstractEntity {
 	private PetJpa petJpa;
 	
 	private MbrJpa mbrJpa;
+	
+	private long petSeq;
+	
+	private String petNm;
+	
+	private String petIntro;
 }

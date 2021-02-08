@@ -29,16 +29,6 @@
 				</v-avatar>
 			</v-badge>
 			<input id="fileId" type="file"	@input="upload" style="display : none;"/>
-	 		<!-- <v-file-input 
-		 		small-chips
-		 		id="fileId"
-		 		v-model="files"
-		 		:rules="imgRules" 
-		 		@click:clear="delPetImg(petImgNm)"
-		 		show-size label="File input" 
-		 		@input="upload"
-		 		style="display : none;"
-	 		></v-file-input> -->
 	 		<v-text-field
  				v-model="petNm"
  				id="petNm"
@@ -86,18 +76,6 @@
 		        </v-chip>
 		     </v-chip-group>
              <br>
-	 		<!-- <v-text-field
- 				v-model="petSpec"
- 				id="petSpec"
- 				label ="종">
-	 		</v-text-field> -->
-	 		<!-- <v-text-field
- 				v-model="mbrId"
- 				id="mbrId"
- 				label ="*이름">
-	 		</v-text-field> -->
-	 		
-	 			
 	 		<v-switch
               v-model="petBirthYn"
               label="생년월일 사용"
@@ -164,7 +142,7 @@
 <script>
 import router from '@/router/index.js'
 import {getAuthAxios} from '@/interceptor/axiosInterceptor'
-
+import {getFilExtCommon , ImgfileSizeCheckCommon} from '@/common/nawagoCommonJs'
 
   export default {
     name: 'RegisterPage',
@@ -226,7 +204,17 @@ import {getAuthAxios} from '@/interceptor/axiosInterceptor'
 			var that = this;
 		    var fd = new FormData();
 		    var $imgInput = document.querySelector('#fileId')
-		    console.log('upload : ',$imgInput.files[0]);
+		    
+		    if(!getFilExtCommon($imgInput.files[0])){
+				alert('이미지 파일만 등록 가능합니다.');
+				return ;
+			}
+		    
+		    if(!ImgfileSizeCheckCommon($imgInput.files[0])){
+		    	alert('이미지는 최대 10MB 까지 등록 가능합니다.');
+				return ;
+		    }
+		    
 		    fd.append('data',  $imgInput.files[0])
 		    
 		    await axios.post('/api/pet/file/upload', fd,  
@@ -250,7 +238,6 @@ import {getAuthAxios} from '@/interceptor/axiosInterceptor'
 		    delPetImg : async function(){//파일 삭제
 		    	
 		    	var $imgInput = document.querySelector('#fileId');
-		    	console.log($imgInput.files)
 		    	if($imgInput.files.length < 1)return;
 		    	var that = this;
 		    	var param = {
@@ -266,35 +253,6 @@ import {getAuthAxios} from '@/interceptor/axiosInterceptor'
 		    	that.petImgNm = null;
 	            that.petImgUrl = null;
 	            document.querySelector('#fileId').value=null;
-			},
-			getFilExt : function(file){//파일명 추출
-				
-				if(file != null ){
-					if(file.name != null){
-						var acceptExt = ['jpg','jpeg','png'];
-						
-						var fileNm = file.name;
-						var fileNmLength = fileNm.length;
-						var lastDot = fileNm.lastIndexOf('.');
-						
-						console.log(fileNm.substring(lastDot, fileNmLength))
-						var ext = fileNm.substring(lastDot+1, fileNmLength);
-						ext = ext.toLowerCase();
-						if(acceptExt.indexOf(ext) > -1){
-							return true;
-						}else{
-							return false;
-						}
-					}else{
-						return false;
-					}
-					
-					
-				
-				}else{
-					return false;
-				}
-
 			},
 			getRealFileName : function(fileUrl){//파일명 추출
 				

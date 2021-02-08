@@ -1,7 +1,7 @@
 <template>
 	<div  v-if="myInfo != null" >
 		<v-layout row wrap class="text-center">
-			<v-flex xs12  >
+			<v-flex xs12 v-if="isMySelf" >
 				<v-badge
 		            icon="mdi-camera-flip"
 			        bordered
@@ -26,6 +26,18 @@
 			    </v-avatar>
 			    </v-badge>
 			</v-flex>
+			<v-flex xs12 v-else >
+				<v-avatar size="110">
+			      <img v-if="myInfo.mbrRpstImgUrl != null &&  myInfo.mbrRpstImgNm != null"
+			        :src="myInfo.mbrRpstImgUrl + '/' + myInfo.mbrRpstImgNm"
+			        id="clientImg"
+			      >
+			      <img v-else
+			        src="@/assets/emptyProfile2.png"
+			        id="emptyImg"
+			      >
+			    </v-avatar>
+			</v-flex>
 			<v-flex xs12 >
 				<div>
 					<span>{{myInfo.mbrNickNm}}</span><br>
@@ -39,9 +51,10 @@
 			<v-row justify="center">
 			    <v-expansion-panels >
 			      <v-expansion-panel>
-			        <v-expansion-panel-header>나의 식구</v-expansion-panel-header>
+			        <v-expansion-panel-header v-if="isMySelf">나의 식구</v-expansion-panel-header>
+			        <v-expansion-panel-header v-else>식구</v-expansion-panel-header>
 			        <v-expansion-panel-content>
-				        <v-layout row wrap v-if="myInfo.mbrPet == null || myInfo.mbrPet.length < 1">
+				        <v-layout row wrap v-if="isMySelf && (petList == null || petList.length < 1)">
 							<v-flex  >
 								<v-btn block  depressed color="primary"
 					 				@click="$router.push({
@@ -55,19 +68,21 @@
 							<v-flex xs6 lg4 md4 xl12
 								v-for="pet in petList">
 								<v-badge
-									icon="mdi-gender-female" v-if="pet.petSex == 'FEMALE' "
+									icon="mdi-gender-female"
 									bordered
 									overlap
 									offset-x="20"
 				        			offset-y="20"
 									color="pink"
+									v-if="pet.petSex == 'FEMALE' "
 						        >
 									<v-avatar size="105">
 										<img v-if="pet.petImgUrl != null && pet.petImgNm != null"
 										:src="pet.petImgUrl + '/' + pet.petImgNm"
-										@click="$router.push({
-											path: '/pet/'+myInfo.mbrId+'/'+pet.petSeq
-										})"
+										alt="pet.petNm"
+										  @click="$router.push({
+											path: '/pet/'+userId+'/'+pet.petSeq
+										})""
 										>
 										<img v-else
 										src="@/assets/emptyPetProfile.png"
@@ -78,25 +93,27 @@
 									</v-avatar>
 							    </v-badge>
 							    <v-badge
-						            icon="mdi-gender-male" v-else-if="pet.petSex == 'MALE'"
+						            icon="mdi-gender-male"
 							        bordered
 							        overlap
 							        offset-x="20"
 				        			offset-y="20"
+							        v-else-if="pet.petSex == 'MALE'"
 						        >
 									<v-avatar size="105">
-								      <img v-if="pet.petImgUrl != null && pet.petImgNm != null"
+									<img v-if="pet.petImgUrl != null && pet.petImgNm != null"
 								        :src="pet.petImgUrl + '/' + pet.petImgNm"
-								        @click="$router.push({
-											path: '/pet/'+myInfo.mbrId+'/'+pet.petSeq
+								        alt="pet.petNm"
+								          @click="$router.push({
+											path: '/pet/'+userId+'/'+pet.petSeq
 										})"
-								      >
-								      <img v-else
+									>
+									<img v-else
 										src="@/assets/emptyPetProfile.png"
 										@click="$router.push({
 											path: '/pet/'+myInfo.mbrId+'/'+pet.petSeq
 										})"
-										>
+									>
 								    </v-avatar>
 							    </v-badge>
 							    <br>
@@ -107,7 +124,7 @@
 							    <br>
 							    <br>
 							</v-flex >
-							<v-flex style="padding-top : 20px; ">
+							<v-flex style="padding-top : 20px; " v-if="isMySelf">
 							 <button id="plusBtn" 
 							 	@click="$router.push({
 							 		name : 'PetRegisterPage'
@@ -121,6 +138,11 @@
 							  </button>
 					     	</v-flex>
 						</v-layout>
+						<v-layout row wrap v-else>
+							<v-flex>
+								비어 있음
+							</v-flex>
+						</v-layout>
 			        </v-expansion-panel-content>
 			      </v-expansion-panel>
 			    </v-expansion-panels>
@@ -131,7 +153,8 @@
 		>
 			<v-flex>
 				<div style="padding-bottom : 10px;">
-					<span>나의 스토리</span>
+					<span v-if="isMySelf">나의 스토리</span>
+					<span v-else>스토리</span>
 				</div>
 				<v-divider>
 				</v-divider>
@@ -284,7 +307,7 @@
 						      <img v-if="myInfo != null"
 					      		:src="myInfo.mbrRpstImgUrl +'/'+  myInfo.mbrRpstImgNm "
 					      	  >
-					      	  <img v-else
+					      	   <img v-else
 					      		src="@/assets/emptyProfile2.png"
 					      	  >
 						    </v-avatar>
@@ -404,21 +427,21 @@
       </v-btn>
     </v-speed-dial>
 </div>
-  
 </template>
 
 <script>
 import { Swiper, SwiperSlide, directive } from 'vue-awesome-swiper'
 import { getAuthAxios , getAuthCheckedAxios} from '@/interceptor/axiosInterceptor'
 import {getFilExtCommon , ImgfileSizeCheckCommon} from '@/common/nawagoCommonJs'
+import {mapGetters , mapActions} from 'vuex'
 import store from '@/store/store'
   export default {
     name: 'myPage',
     data: function(){
     	return {
-    		profilePhotoYn : false,
-    		isMyself : false,
+    		isMySelf : false,
     		userId : this.$route.params.userId,
+    		profilePhotoYn : false,
     		myInfo : {
     			mbrId : null,
     			mbrEmail : null,
@@ -433,7 +456,6 @@ import store from '@/store/store'
     		},
     		petList : [],
     		myShowOffList : [],
-    		test : '하이',
     		authAxios : getAuthCheckedAxios(),
     		profilePhotoUrl : '',
     		loading : false,
@@ -465,9 +487,9 @@ import store from '@/store/store'
     directives: {
         swiper: directive
     },
-    beforeCreate : function(){
-
-    },
+	beforeCreate(){
+		this.$store.commit('getPublicMbrInfo')
+	},
     created : function() {
     	var that = this;
     	that.getMbrInfo();
@@ -519,26 +541,40 @@ import store from '@/store/store'
         }, 
    		 
    	 },
-    methods : {
+	methods : {
+		getMbrInfo : function(){
+			var that = this;
+			
+			axios.get('/api/member/getUserInfo',{
+				params : {
+					'userId' : that.userId
+				}
+			}).
+			then(function(resp){
+				if(resp.data == ''){
+					alert('존재하지 않는 아이디 입니다.');
+					that.$router.push({name : 'showOffList'})
+				}else{
+					that.myInfo = resp.data.mbrJpa;
+					that.petList = resp.data.petJpaList;
+					
+					if(that.$store.getters.getIsLogin){
+						if(that.userId == that.$store.getters.getMbrId ){
+							that.isMySelf = true;
+						}
+					}
+					that.getFirstMyShowOffListPage();
+				}
+			})
+			.catch(function(err){
+				console.log(err);
+			})
+			
+		},
     	updateMbr : function(){
     		this.$router.push({
     			name : 'updateMember'
     		})
-    	},
-    	getMbrInfo : function(){
-    		var that = this;
-        	store.dispatch('getMbrInfo')
-        	.then(function(data){
-        		if(data.mbrId == that.userId){
-        			that.isMyself = true;
-        		}
-        		that.myInfo = data;
-        		that.petList = that.myInfo.mbrPet;
-        		that.getFirstMyShowOffListPage();
-        	})
-        	.catch(function(err){
-        		console.log(err)
-        	})
     	},
     	fileClick : function(idx){
    			var $fileEl = document.querySelector('#fileId');
@@ -635,6 +671,7 @@ import store from '@/store/store'
 			}
 			await axios.post('/api/pet/file/delete', param)
 		      .then( response => {
+		            console.log('SUCCESS DELETE!!');
 	          })
 	          .catch(function () {
 	            	console.log('FAILURE DELETE!!');
@@ -644,7 +681,8 @@ import store from '@/store/store'
             document.querySelector('#fileId').value=null;
 		},
         timeForToday : function(value) {
-        	var that = this;
+        	
+   			var that = this;
 	   		var today = this.$moment()   
 	        var timeValue = this.$moment(value)  
 	        var betweenTime = Math.floor((today - timeValue) / 1000 / 60);
@@ -731,21 +769,20 @@ import store from '@/store/store'
    		checkAuth: function(){
   			 var that = this;
   			store.dispatch('getValidAuth')
-       	.then(function(data){
-       	})
-       	.catch(function(err){
-       		alert('댓글 작성을 위해\n로그인 페이지로 이동합니다.');
-       		that.$router.push({
-       			name:'plainLogin'
-       		})
-       	})
+	       	.then(function(data){
+	       	})
+	       	.catch(function(err){
+	       		alert('댓글 작성을 위해\n로그인 페이지로 이동합니다.');
+	       		that.$router.push({
+	       			name:'plainLogin'
+	       		})
+	       	})
   		},
   		openReply : function(showOffSeq){
   			
   			var that = this;
   			that.getShowOffReplyList(showOffSeq);
   			that.currentShowOffSeq = showOffSeq;
-  			//that.getMbrInfo();
    		
   		},
   		getShowOffReplyList : function(showOffSeq){

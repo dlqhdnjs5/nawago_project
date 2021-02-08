@@ -10,12 +10,6 @@
 			    v-model="valid"
 			    lazy-validation
 			  >
-	 			<!-- <v-text-field
-	 				v-model="mbrId"
-	 				id="mbrId"
-	 				:rules="mbrIdRules"
-	 				label ="*아이디">
-	 			</v-text-field> -->
 	 			<v-text-field
 	 				v-model="nickname"
 	 				:rules = "nicknameRules"
@@ -79,6 +73,8 @@
 import {mapGetters , mapActions} from 'vuex'
 import router from '@/router/index.js'
 import store from '@/store/store'
+import { getAuthAxios , getAuthCheckedAxios} from '@/interceptor/axiosInterceptor'
+
 
   export default {
     name: 'updateMember',
@@ -94,6 +90,7 @@ import store from '@/store/store'
 			mbrEmail : '',
 			name : '',
 			bfMyInfo : {},
+			authAxios : getAuthCheckedAxios(),
 			myInfo : {},
 			/* mbrIdRules: [
 		        value => !!value || '아이디를 입력해주세요.',
@@ -161,7 +158,7 @@ import store from '@/store/store'
 	    	   				mbrNm		: that.name,
 	    	   				mbrSeq 		: that.myInfo.mbrSeq
 	    	   		   }
-	    	   		    axios.post('/api/member/update',param)
+	    	   			that.authAxios.post('/api/member/update',param)
 	    	   		   .then(function(resp){
 	    	   			alert('프로필 변경이 완료되었습니다.')
 	    	   			router.push({

@@ -13,10 +13,12 @@
 			      	<img
 			      		v-if="showOffObj.mbrJpa.mbrRpstImgUrl != null &&  showOffObj.mbrJpa.mbrRpstImgNm != null"
 			      		:src="showOffObj.mbrJpa.mbrRpstImgUrl + '/' + showOffObj.mbrJpa.mbrRpstImgNm"
+			      		@click="$router.push({path: '/user/'+showOffObj.mbrJpa.mbrId})"
 			      	>
 			      	<img
 			      		v-else
 			      		src="@/assets/emptyProfile2.png"
+			      		@click="$router.push({path: '/user/'+showOffObj.mbrJpa.mbrId})"
 			      	>
 			      </v-list-item-avatar>
 			      <v-list-item-content>
@@ -63,12 +65,6 @@
 			       <v-icon>mdi-chat-outline</v-icon>	
 			      </v-btn>
 			      <v-spacer></v-spacer>
-			      <v-btn icon>
-			        <v-icon>mdi-heart</v-icon>
-			      </v-btn>
-			      <v-btn icon>
-			        <v-icon>mdi-share-variant</v-icon>
-			      </v-btn>
 			    </v-card-actions>
 			  </v-card>
 			</v-flex>
@@ -120,14 +116,25 @@
 						      <img v-if="mbrInfo != null"
 					      		:src="mbrInfo.mbrRpstImgUrl +'/'+  mbrInfo.mbrRpstImgNm "
 					      	  >
+					      	  <img v-else
+					      		src="@/assets/emptyProfile2.png"
+					      	  >
 						    </v-avatar>
-							<v-text-field
+							<v-text-field v-if="isLogin"
 								label="댓글달기"
 								outlined
 								dense
 								style="padding-left:2%;"
-								@focus="checkAuth"
 								v-model="replyCont"
+							>
+							</v-text-field>
+							<v-text-field v-else
+								label="로그인을 해주세요!"
+								outlined
+								dense
+								style="padding-left:2%;"
+								v-model="replyCont"
+								disabled="disabled"
 							>
 							</v-text-field>
 						
@@ -160,7 +167,7 @@
 					      	>
 					      	<img 
 					      		v-else
-					      		src="@/assets/anonymous.png"
+					      		src="@/assets/emptyProfile2.png"
 					      	>
 					      </v-list-item-avatar>
 					      <v-list-item-content>
@@ -221,18 +228,6 @@ import {mapGetters , mapActions} from 'vuex'
    			replyCont : null,
    			showOffReplyList : [],
 		    btnDisabled : true,
-   			/*myInfo : {
-    			mbrId : null,
-    			mbrEmail : null,
-    			mbrGrdCd : null,
-    			mbrMobileNo : null,
-    			mbrNm : null,
-    			mbrNickNm : null,
-    			mbrTpCd : null,
-    			mbrRpstImgUrl : null,
-    			mbrRpstImgNm : null,
-    			mbrSeq : null
-    		}, */
    		}
    	},
    	computed: {
@@ -244,10 +239,11 @@ import {mapGetters , mapActions} from 'vuex'
    			isLogin : 'getIsLogin'
    		}),
     },
+    beforeCreate(){
+		this.$store.commit('getPublicMbrInfo')
+	},
    	created : function(){
-   		this.$store.commit('getPublicMbrInfo')
    		var that = this;
-   		
 		that.getFirstShowOffListPage();
 		
    	},
@@ -290,16 +286,16 @@ import {mapGetters , mapActions} from 'vuex'
    	 },
    	methods : {
    		checkAuth: function(){
-   			 var that = this;
-   			store.dispatch('getValidAuth')
-        	.then(function(data){
-        	})
-        	.catch(function(err){
-        		alert('댓글 작성을 위해\n로그인 페이지로 이동합니다.');
-        		that.$router.push({
-        			name:'plainLogin'
-        		})
-        	})
+   		 	var that = this;
+			store.dispatch('getValidAuth')
+	       	.then(function(data){
+	       	})
+	       	.catch(function(err){
+	       		alert('댓글 작성을 위해\n로그인 페이지로 이동합니다.');
+	       		that.$router.push({
+	       			name:'plainLogin'
+	       		})
+	       	})
    		},
    		openReply : function(showOffSeq){
    			
@@ -309,17 +305,6 @@ import {mapGetters , mapActions} from 'vuex'
    			//that.getMbrInfo();
     		
    		},
-   		/* getMbrInfo : function(){
-    		var that = this;
-        	store.dispatch('getMbrInfo')
-        	.then(function(data){
-        		that.myInfo = data;
-        		console.log(data);
-        	})
-        	.catch(function(err){
-        		console.log(err)
-        	})
-    	}, */
     	getShowOffReplyList : function(showOffSeq){
     		var that = this;
     		axios.get('/api/showOff/getShowOffReplyList',{
@@ -409,27 +394,39 @@ import {mapGetters , mapActions} from 'vuex'
    			});
    		},
    		timeForToday : function(value) {
-	   		var today = new Date();
-	        var timeValue = new Date(value);
-	        
-	        var betweenTime = Math.floor((today.getTime() - timeValue.getTime()) / 1000 / 60);
+   			
+   			var that = this;
+	   		var today = this.$moment()   
+	        var timeValue = this.$moment(value)  
+	        var betweenTime = Math.floor((today - timeValue) / 1000 / 60);
+	       
 	        if (betweenTime < 1) return '방금전';
 	        if (betweenTime < 60) {
-	            return betweenTime + '분전';
+	            return parseInt(betweenTime) + '분전';
 	        }
 	        
 	        var betweenTimeHour = Math.floor(betweenTime / 60);
 	        if (betweenTimeHour < 24) {
-	            return betweenTimeHour + '시간전';
+	            return parseInt(betweenTimeHour) + '시간전';
 	        }
 	        
 	        var betweenTimeDay = Math.floor(betweenTime / 60 / 24);
 	        if (betweenTimeDay < 365) {
-	            return betweenTimeDay + '일전';
+	            return parseInt(betweenTimeDay) + '일전';
 	        }
 	        
-	        return String(Math.floor(betweenTimeDay / 365)) + '년전';
+	        return Math.floor(betweenTimeDay / 365) + '년전';
 
+   		},
+   		renderDate : function(date){
+   		   var d = new Date(date)
+           var month = d.getMonth() + 1
+           var day = d.getDate()
+           var year = d.getFullYear()
+           var hour = d.getHours()
+           var minutes = d.getMinutes()
+           var seconds = d.getSeconds()
+           return year+'-'+month + '-' + day  +   ' ' + hour + ':' + minutes + ':' + seconds;    
    		}
    		
    	}
