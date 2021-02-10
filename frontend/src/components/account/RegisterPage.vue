@@ -106,7 +106,7 @@ import router from '@/router/index.js'
 			  ],
 		   nicknameRules: [
 		        value => !!value || '닉네임을 입력해주세요.',
-		        value => (value && value.length  <= 8) || '닉네임은 최대 13자까지 입력 가능합니다.',
+		        value => (value && value.length  <= 15) || '닉네임은 최대 15자까지 입력 가능합니다.',
 		        value => (value && value.length  >= 2) || '닉네임을 최소 2자이상 입력해주세요.',
 		        value => (this.checkEx(value)) || '특수문자나 공백을 제외하고 입력해 주세요.'
 		      ],
@@ -116,7 +116,7 @@ import router from '@/router/index.js'
 		        value => (value && value.length <= 20) || '이메일은 최대 20자까지 입력 가능합니다.',
 		      ],
 		   nameRules: [
-			   value => (value.length  <= 8) || '이름은 최대 8자까지 입력 가능합니다.',
+			   value => (value.length  <= 15) || '이름은 최대 15자까지 입력 가능합니다.',
 			   value => (!this.checkBlank(value)) || '공백을 제외한 이름을 입력해주세요.',
 		      ],      
 		}

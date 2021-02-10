@@ -7,9 +7,10 @@ import router from './router'
 import store from '@/store/store'
 import {getAuthAxios} from '@/interceptor/axiosInterceptor'
 import VueAwesomeSwiper from 'vue-awesome-swiper'
-import "swiper/swiper-bundle.min.css"
 import InfiniteLoading from 'vue-infinite-loading';
 import VueMoment from 'vue-moment'
+import moment from 'moment-timezone'
+import 'swiper/css/swiper.css'
 
 
 Vue.config.productionTip = false
@@ -20,7 +21,8 @@ Vue.use(store)
 Vue.use(vuetify)
 Vue.use(VueAwesomeSwiper)
 Vue.use(InfiniteLoading)
-Vue.use(VueMoment)
+Vue.use(VueMoment,{ moment, })
+
 
 new Vue({
   directives: {InfiniteLoading},

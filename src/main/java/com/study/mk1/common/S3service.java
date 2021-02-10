@@ -54,7 +54,7 @@ public class S3service {
     public String uploadWithRandomFileNm(MultipartFile file,String uploadPath) throws IOException {
        
     	String ext = this.getFileExt(file);
-        String randomStr = this.getRandomStr(11);
+        String randomStr = this.getRandomStr(16);
         String fileName = uploadPath+randomStr+ext;
         s3Client.putObject(new PutObjectRequest(globalPropertySource.getBucket(), fileName, file.getInputStream(), null)
                 .withCannedAcl(CannedAccessControlList.PublicRead));

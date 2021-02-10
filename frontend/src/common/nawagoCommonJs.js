@@ -5,7 +5,6 @@ export function getFilExtCommon (file){
 	
 	if(file != null ){
 		if(file.name != null){
-			var acceptExt = ['jpg','jpeg','png'];
 			
 			var fileNm = file.name;
 			var fileNmLength = fileNm.length;
@@ -23,6 +22,32 @@ export function getFilExtCommon (file){
 			return false;
 		}
 	
+	}else{
+		return false;
+	}
+
+}
+
+export function getFileTpCommon (fileUrl){
+	
+	if(fileUrl != null ){
+		
+		var imgExt = ['jpg','jpeg','png'];
+		var movExt = ['webm','mp4','ogg'];
+		
+		var fileUrlLength = fileUrl.length;
+		var lastDot = fileUrl.lastIndexOf('.');
+		var ext = fileUrl.substring(lastDot+1, fileUrlLength);
+		ext = ext.toLowerCase();
+		
+		if(imgExt.indexOf(ext) > -1 ){
+			return 'IMG';
+		}else if( movExt.indexOf(ext) > -1  ) {
+			return 'MOV';
+		}else{
+			return false;
+		}
+		
 	}else{
 		return false;
 	}

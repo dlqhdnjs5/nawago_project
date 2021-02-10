@@ -42,6 +42,13 @@ export default new Vuex.Store({
 		getMbrSeq : function(state){
 			return state.mbrInfo.mbrSeq;
 		},
+		getMbrImg : function(state){
+			if(state.mbrInfo.mbrRpstImgUrl == null ||state.mbrInfo.mbrRpstImgNm == null ){
+				return null;
+			}else{
+				return state.mbrInfo.mbrRpstImgUrl + '/' + state.mbrInfo.mbrRpstImgNm;
+			}
+		},
 	},
 	mutations : {
 		loginSuccess : (state) => {

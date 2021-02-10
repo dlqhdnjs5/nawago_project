@@ -37,19 +37,22 @@
 			        id="emptyImg"
 			      >
 			    </v-avatar>
-			</v-flex>
+			</v-flex> 
 			<v-flex xs12 >
 				<div>
 					<span>{{myInfo.mbrNickNm}}</span><br>
 					<p class="grey--text">{{myInfo.mbrId}}</p>
 				</div>
 			</v-flex>
-		</v-layout>
+		</v-layout> 
+		
+		
 		<v-divider style="padding-top : 40px;">
 		</v-divider>
-		<v-layout row wrap class="text-center">
-			<v-row justify="center">
-			    <v-expansion-panels >
+		
+		
+		 <v-layout row wrap class="text-center">
+			  <v-expansion-panels >
 			      <v-expansion-panel>
 			        <v-expansion-panel-header v-if="isMySelf">나의 식구</v-expansion-panel-header>
 			        <v-expansion-panel-header v-else>식구</v-expansion-panel-header>
@@ -146,8 +149,9 @@
 			        </v-expansion-panel-content>
 			      </v-expansion-panel>
 			    </v-expansion-panels>
-			</v-row>
-		</v-layout>
+		</v-layout> 
+		
+		
 		<v-layout
 			style="padding-top : 40px;" 
 		>
@@ -158,7 +162,7 @@
 				</div>
 				<v-divider>
 				</v-divider>
-			</v-flex>
+			</v-flex> 
 		</v-layout>
 		
 		<v-layout 
@@ -173,27 +177,27 @@
 					class="mx-auto"
 					max-width="344"
 				  >
-					<template v-if="myShowOffObj.showOffAttachJpa.length > 1">
+					<template v-if="myShowOffObj.showOffJpa.showOffAttachJpa.length > 1">
 						<swiper ref="mySwiper" 
 							class="swiper"
 							:options="swiperOptions" 
-							v-if="myShowOffObj.showOffAttachJpa != null" 
+							v-if="myShowOffObj.showOffJpa.showOffAttachJpa != null" 
 						> 
-							<swiper-slide v-for="showOffAttachObj in myShowOffObj.showOffAttachJpa" >
+							<swiper-slide v-for="showOffAttachObj in myShowOffObj.showOffJpa.showOffAttachJpa" >
 								<v-img 
 									class="white--text align-end"
 									height="295"
 									:src="showOffAttachObj.showOffAttachUrl + '/' + showOffAttachObj.showOffAttachNm"
 								></v-img>
 							</swiper-slide>
+							 <div class="swiper-pagination s01" slot="pagination"></div>
 						</swiper>
-						<div class="swiper-pagination" slot="pagination"></div>
 					</template>
-					<template  v-else-if="myShowOffObj.showOffAttachJpa.length == 1">
+					<template  v-else-if="myShowOffObj.showOffJpa.showOffAttachJpa.length == 1">
 						<v-img 
 							class="white--text align-end"
 							height="295"
-							:src="myShowOffObj.showOffAttachJpa[0].showOffAttachUrl + '/' + myShowOffObj.showOffAttachJpa[0].showOffAttachNm"
+							:src="myShowOffObj.showOffJpa.showOffAttachJpa[0].showOffAttachUrl + '/' + myShowOffObj.showOffJpa.showOffAttachJpa[0].showOffAttachNm"
 						></v-img>
 					</template>
 					
@@ -201,12 +205,12 @@
 					
 					<v-card-subtitle 
 						class="pb-0"
-						v-text="timeForToday(myShowOffObj.regDt)"
+						v-text="timeForToday(myShowOffObj.showOffJpa.regDt)"
 					>
 					</v-card-subtitle>
 				
 					<v-card-text class="text--primary"
-						v-html="getShoOffCont(myShowOffObj.showOffCont)"
+						v-html="getShoOffCont(myShowOffObj.showOffJpa.showOffCont)"
 					>
 					</v-card-text>
 				
@@ -220,9 +224,10 @@
 						<v-btn
 					        color="#00BFA5"
 					        icon
-					        @click="replySheet = !replySheet; openReply(myShowOffObj.showOffSeq);"
+					        @click="replySheet = !replySheet; openReply(myShowOffObj.showOffJpa.showOffSeq);"
 						>
 							<v-icon>mdi-chat-outline</v-icon>	
+							<span>{{myShowOffObj.replyCnt}}</span>
 						</v-btn>
 					</v-card-actions>
 				</v-card>
@@ -281,7 +286,8 @@
 		        </v-list-item>
 		      </v-list>
 		    </v-bottom-sheet>
-		  </div>
+		  </div> 
+	
 	
 	
 	<div class="text-center">
@@ -316,9 +322,9 @@
 				<v-layout style="padding-left:7%">
 					<v-flex row wrap>
 							<v-avatar size="38">
-							<template v-if="myInfo != null">
-						      <img v-if="myInfo.mbrRpstImgUrl != null && myInfo.mbrRpstImgNm != null"
-					      		:src="myInfo.mbrRpstImgUrl +'/'+  myInfo.mbrRpstImgNm "
+							<template v-if="$store.getters.getIsLogin">
+						      <img v-if="$store.getters.getMbrImg != null"
+					      		:src="$store.getters.getMbrImg"
 					      	  >
 					      	   <img v-else
 					      		src="@/assets/emptyProfile2.png"
@@ -329,6 +335,7 @@
 								label="댓글달기"
 								outlined
 								dense
+								color="#00BFA5"
 								style="padding-left:2%;"
 								v-model="replyCont"
 							>
@@ -340,6 +347,7 @@
 								style="padding-left:2%;"
 								v-model="replyCont"
 								disabled="disabled"
+								@click="askLogin"
 							>
 							</v-text-field>
 						
@@ -347,7 +355,7 @@
 								id="addReplyBtn"
 								style="padding-left:9%;"
 								icon
-								color="blue"
+								color="#00BFA5"
 								@click="addShowOffReply()"
 								:disabled="btnDisabled"
 							>
@@ -451,8 +459,14 @@ import { getAuthAxios , getAuthCheckedAxios} from '@/interceptor/axiosIntercepto
 import {getFilExtCommon , ImgfileSizeCheckCommon} from '@/common/nawagoCommonJs'
 import {mapGetters , mapActions} from 'vuex'
 import store from '@/store/store'
+import 'swiper/css/swiper.css'
+
   export default {
     name: 'myPage',
+    components : {
+    	Swiper,
+    	SwiperSlide,
+    },
     data: function(){
     	return {
     		isMySelf : false,
@@ -480,11 +494,10 @@ import store from '@/store/store'
    			listPageSize : 6,
    			leftShowOffList : false, //더이상 showofflist 남았는지 안남앗는지 여부로 api호출 을 구분
    			swiperOptions: {
-                slidesPerView: 1,
-      	          pagination: {
-      	            el: '.swiper-pagination',
-      	          },
-      		},
+     	          pagination: {
+     	            el: '.swiper-pagination.s01',
+     	          },
+     	        },
       		sheet: false,
       		replySheet : false,
       		currentShowOffSeq : null,
@@ -543,6 +556,12 @@ import store from '@/store/store'
 	   	    	}
 	    	}else{
 	    		that.btnDisabled = true;
+	    	}
+	    },
+	    $route : function(newVal,oldVal) {
+	    	
+	    	if(newVal.fullPath != oldVal.fullPath){
+	    		location.reload();
 	    	}
 	    }
    	 },
@@ -655,31 +674,9 @@ import store from '@/store/store'
         	}
         	return param;
         },
-        getMyShowOffList : function(){
-        	
-        	var that = this;
-        	
-        	var mbrSeqParam = that.myInfo.mbrSeq;
-        	console.log(mbrSeqParam)
-        	that.authAxios.get('/api/showOff/getMyShowOffList', { 
-        		params : { 
-        			mbrSeq : mbrSeqParam
-        		}
-			})
-        	.then(function(resp){
-        		console.log('list : ',resp.data)
-        		that.myShowOffList = resp.data;
-        	})
-        	.catch(function(err){
-        		console.log(err)
-        	})
-        	
-        	
-        },
         delPetImg : async function(){//파일 삭제
 	    	
 	    	var $imgInput = document.querySelector('#fileId');
-	    	console.log($imgInput.files)
 	    	if($imgInput.files.length < 1)return;
 	    	var that = this;
 	    	var param = {
@@ -687,7 +684,6 @@ import store from '@/store/store'
 			}
 			await axios.post('/api/pet/file/delete', param)
 		      .then( response => {
-		            console.log('SUCCESS DELETE!!');
 	          })
 	          .catch(function () {
 	            	console.log('FAILURE DELETE!!');
@@ -699,8 +695,8 @@ import store from '@/store/store'
         timeForToday : function(value) {
         	
    			var that = this;
-	   		var today = this.$moment()   
-	        var timeValue = this.$moment(value)  
+   			var today = this.$moment.tz('Asia/Seoul');
+	        var timeValue = this.$moment(value).tz('Asia/Seoul');
 	        var betweenTime = Math.floor((today - timeValue) / 1000 / 60);
 	        
 	        if (betweenTime < 1) return '방금전';
@@ -800,6 +796,13 @@ import store from '@/store/store'
   			that.getShowOffReplyList(showOffSeq);
   			that.currentShowOffSeq = showOffSeq;
    		
+  		},
+  		askLogin : function(){
+  			if(confirm('로그인을 하셔야 댓글입력이 가능합니다.\n로그인 하시겠습니까?')){
+  				this.$router.push({
+  					name : '/plainLogin'
+  				});
+  			}
   		},
   		getShowOffReplyList : function(showOffSeq){
     		var that = this;

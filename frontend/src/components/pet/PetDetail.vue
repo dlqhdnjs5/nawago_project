@@ -1,12 +1,12 @@
 <template>
-	<div class="text-center">
+	<div >
 		<div>
-			<v-layout align-right>
+			<v-layout align-right class="text-center">
 				<v-flex xs12 lg12 md12 xl12 
 					v-if="isOwner"
 				>
 					<v-badge
-			            icon="mdi-camera-flip"
+			            icon="mdi-bone"
 				        bordered
 				        bottom
 				        overlap
@@ -42,7 +42,7 @@
 				<v-flex>
 				</v-flex>
 			</v-layout>
-			<v-layout>
+			<v-layout class="text-center">
 				<v-flex>
 					<br>
 					<span class="font-weight-bold" v-text="petInfo.petNm" ></span>
@@ -50,7 +50,7 @@
 					<v-icon  color="blue" v-else>mdi-gender-male</v-icon>
 				</v-flex>
 			</v-layout>
-			<v-layout>
+			<v-layout class="text-center">
 				<v-flex >
 					<span class="text-caption" v-text="getAge(petInfo.petBirth)"></span>&nbsp
 					<v-icon color="#F48FB1" v-if="isBaby">
@@ -58,12 +58,12 @@
 					</v-icon>
 				</v-flex>
 			</v-layout>
-			<v-layout style="padding-top : 30px;">
+			<v-layout style="padding-top : 30px;" class="text-center">
 				<v-flex class="font-weight-bold text--disabled">
-					성격
+					성향
 				</v-flex>
 			</v-layout>
-			<v-layout>
+			<v-layout class="text-center">
 				<v-flex>
 					<v-chip
 					v-for="Char in petCharList"
@@ -75,13 +75,14 @@
 				    </v-chip>
 			    </v-flex>
 			</v-layout>
-			<v-layout style="padding-top : 40px;">
+			<v-layout style="padding-top : 40px;" class="text-center">
 				<v-flex class="font-weight-bold text--disabled">
 					인삿말
 				</v-flex>
 			</v-layout>
-			<v-layout>
-			<div v-html="petInfo.petIntro" class="text-caption" style="padding-bottom:10%;padding-left:10%;padding-right:10%;padding-top:3%;">
+			<v-layout >
+			<div  class="text-caption"  style="width:100%; overflow:hidden; word-wrap:break-word;padding-bottom:10%;padding-left:10%;padding-right:10%;padding-top:3%;" v-html="getShoOffCont(petInfo.petIntro)"  >
+				
 			</div>
 			</v-layout>
 			
@@ -325,6 +326,9 @@ import {getFilExtCommon , ImgfileSizeCheckCommon} from '@/common/nawagoCommonJs'
 	        	}
 	        	return param;
 	     },
+	     getShoOffCont : function(shoOffCont){
+				return shoOffCont.replaceAll('\n','</br>');
+	   	}
 			
 	},
 }

@@ -99,7 +99,7 @@ import { getAuthAxios , getAuthCheckedAxios} from '@/interceptor/axiosIntercepto
 		      ], */
 		   nicknameRules: [
 		        value => !!value || '닉네임을 입력해주세요.',
-		        value => (value && value.length  <= 13) || '닉네임은 최대 13자까지 입력 가능합니다.',
+		        value => (value && value.length  <= 15) || '닉네임은 최대 15자까지 입력 가능합니다.',
 		        value => (value && value.length  >= 2) || '닉네임을 최소 2자이상 입력해주세요.',
 		        value => (this.checkEx(value)) || '특수문자나 공백을 제외하고 입력해 주세요.'
 		      ],

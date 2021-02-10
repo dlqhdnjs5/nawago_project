@@ -1,5 +1,10 @@
 <template>
 	 <v-container style="max-width:100%">
+	 	<v-layout class="text-center">
+	 		<v-flex xs12 sm12 md12 lg12 xl12>
+	 			<img src="@/assets/logo/fullLogo4Green2.png" width="240px">
+	 		</v-flex>
+	 	</v-layout>
 	 	<v-layout align-center>
 	 		<v-flex xs12 >
 	 			<v-form
@@ -10,7 +15,7 @@
 	 			<v-text-field
 	 				color="#00BFA5"
 	 				v-model="email"
-	 				label ="이메일"
+	 				label ="아이디"
 	 				:rules="emailRule"
 	 			>
 	 			</v-text-field>

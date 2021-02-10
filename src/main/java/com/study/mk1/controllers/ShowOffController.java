@@ -31,6 +31,8 @@ import com.study.mk1.common.JwtTokenProvider;
 import com.study.mk1.common.S3service;
 import com.study.mk1.common.XSSUtill;
 import com.study.mk1.data.ShowOffInfoDTO;
+import com.study.mk1.data.ShowOffResult;
+import com.study.mk1.data.ShowOffResultInf;
 import com.study.mk1.enums.ShowOffAttachEnum;
 import com.study.mk1.enums.ShowOffEnum;
 import com.study.mk1.jpa.mbr.MbrJpa;
@@ -67,10 +69,9 @@ public class ShowOffController {
 	
 	@GetMapping("/list")
 	@ResponseBody
-	public List<ShowOffJpa> getShowOffList(HttpServletRequest req,HttpServletResponse res,Pageable pageable) throws Exception {
+	public List<ShowOffResult> getShowOffList(HttpServletRequest req,HttpServletResponse res,Pageable pageable) throws Exception {
 		
-		List<ShowOffJpa> list = showOffJpaCustomRepository.findByShowOffPaging(pageable);
-		
+		List<ShowOffResult> list = showOffJpaCustomRepository.findByShowOffPagingV2(pageable);
 		return list;
 	}
 	
@@ -142,12 +143,12 @@ public class ShowOffController {
 	
 	@GetMapping("/getMyShowOffList")
 	@ResponseBody
-	public ResponseEntity<List<ShowOffJpa>> getMyShowOffList( HttpServletRequest req,HttpServletResponse res,
+	public ResponseEntity<List<ShowOffResult>> getMyShowOffList( HttpServletRequest req,HttpServletResponse res,
 			 @RequestParam(value="params") String mbrSeq, Pageable pageable ) {
 		
 		try {
-			List<ShowOffJpa> list = showOffJpaCustomRepository.findByMbrSeqPaging(Long.parseLong(mbrSeq),pageable);
-			return new ResponseEntity<List<ShowOffJpa>>(list,HttpStatus.OK);
+			List<ShowOffResult> list = showOffJpaCustomRepository.findByMbrSeqPagingV2(Long.parseLong(mbrSeq),pageable);
+			return new ResponseEntity<List<ShowOffResult>>(list,HttpStatus.OK);
 		}catch(Exception e) {
 			log.info(this.getClass()+".getMyShowOffList() [ERROR] --> mbrSeq : {}",mbrSeq); 
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

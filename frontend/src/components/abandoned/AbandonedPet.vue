@@ -1,6 +1,21 @@
 <template>
 <div>
 	<v-layout row wrap>
+		<v-expansion-panels>
+			<v-expansion-panel>
+		      <v-expansion-panel-header>
+		        	<h3>유기 동물 친구들을 식구로 맞이해요 </h3>
+		      </v-expansion-panel-header>
+		      <v-expansion-panel-content >
+		       <v-flex >
+		       		가족을 잃은 상처를 따듯하게 감싸주세요  <v-icon color ="#F48FB1"> mdi-hand-heart </v-icon>
+		       </v-flex>
+		       <v-flex class="caption">
+		       	<span class="font-weight-black" >출처 : </span>농림축산검역본부 동물보호과
+		       </v-flex>
+		      </v-expansion-panel-content>
+		    </v-expansion-panel>
+		    </v-expansion-panels>
 		<v-flex xs12 sm6 md4 lg4 xl4  v-for="(abandonedPet,idx) in abandonedPetList">
 		  <v-card
 		    class="mx-auto"
@@ -26,7 +41,7 @@
 		      </v-expansion-panel-header>
 		      <v-expansion-panel-content class="caption">
 		       <v-flex class="caption">
-		       		중성화 여부  : 
+		       		<span class="font-weight-bold" >중성화 여부  :</span>   
 		       		<span v-if="abandonedPet.neuterYn == 'Y'">
 		       			중성화
 		       		</span>
@@ -35,25 +50,22 @@
 		       		</span>
 		       </v-flex>
 		       <v-flex>
-		       		나이 : {{abandonedPet.age}}
+		       		<span class="font-weight-black" >나이  :</span>  {{abandonedPet.age}}
 		       </v-flex>
 		       <v-flex>
-		       		체중 : {{abandonedPet.weight}}
+		       		<span class="font-weight-black" >체중  :</span>  {{abandonedPet.weight}}
 		       </v-flex>
 		       <v-flex>
-		       		특징 : {{abandonedPet.specialMark}}
+		       		<span class="font-weight-black" >특징  :</span>  {{abandonedPet.specialMark}}
 		       </v-flex>
 		       <v-flex>
-		       		상태 : {{abandonedPet.processState}}
+		       		<span class="font-weight-black" >상태  :</span>  {{abandonedPet.processState}}
 		       </v-flex>
 		       <v-flex>
-		       		보호소 이름 : {{abandonedPet.careNm}}
+		       		<span class="font-weight-black" >보호소 이름  :</span>  {{abandonedPet.careNm}}
 		       </v-flex>
 		       <v-flex>
-		       		보호소 전화번호 : {{abandonedPet.careTel}}
-		       </v-flex>
-		       <v-flex>
-		       		보호소 주소 : {{abandonedPet.careAddr}}
+		       		<span class="font-weight-black" >보호소 전화번호  :</span>   {{abandonedPet.careTel}}
 		       </v-flex>
 		       
 		      </v-expansion-panel-content>
@@ -169,8 +181,8 @@ import store from '@/store/store'
    		timeForToday : function(value) {
    			
    			var that = this;
-	   		var today = this.$moment()   
-	        var timeValue = this.$moment(value)  
+   			var today = this.$moment.tz('Asia/Seoul');
+	        var timeValue = this.$moment(value).tz('Asia/Seoul'); 
 	        var betweenTime = Math.floor((today - timeValue) / 1000 / 60);
 	       
 	        if (betweenTime < 1) return '방금전';

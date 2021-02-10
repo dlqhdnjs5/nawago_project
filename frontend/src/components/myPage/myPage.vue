@@ -659,8 +659,8 @@ import store from '@/store/store'
 		},
         timeForToday : function(value) {
         	var that = this;
-	   		var today = this.$moment()   
-	        var timeValue = this.$moment(value)  
+        	var today = this.$moment.tz('Asia/Seoul');
+	        var timeValue = this.$moment(value).tz('Asia/Seoul');
 	        var betweenTime = Math.floor((today - timeValue) / 1000 / 60);
 	        
 	        if (betweenTime < 1) return '방금전';

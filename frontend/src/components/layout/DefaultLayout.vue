@@ -4,7 +4,9 @@
 		<v-btn icon @click="back">
 			<v-icon>mdi-arrow-left</v-icon>
 		</v-btn> 
-		  <v-toolbar-title style="color:#00BFA5;" @click="$router.push({name : 'showOffList'})">NawaGo</v-toolbar-title>
+		 <v-toolbar-title style="color:#00BFA5;" @click="$router.push({name : 'showOffList'})">
+		  		<img src="@/assets/logo/smallLogoGreen2.png"  height="60px" style="padding-top:10px;" >
+		  </v-toolbar-title>
 		  <v-spacer></v-spacer>
 		  <v-toolbar-items class="hidden-sm-and-down">
 		  </v-toolbar-items>
@@ -98,7 +100,7 @@
      	  hide-on-scroll
 	    >
 	      <v-btn icon  color="#00BFA5"
-	       @click="$router.push({name : 'showOffList'})">
+	       @click="$router.push({name : 'showOffList'}).catch(()=>{})">
 	        <v-icon>mdi-history</v-icon><!-- <v-icon>mdi-paw</v-icon> -->
 	      </v-btn>
 	
@@ -107,14 +109,14 @@
 	      </v-btn>
 	      
 	      <v-btn icon  color="#00BFA5"
-	       @click="$router.push({name : 'AddShowOff'})">
+	       @click="$router.push({name : 'AddShowOff'}).catch(()=>{})">
 	        <v-icon>mdi-plus-box-outline</v-icon>
 	      </v-btn>
 	
 	      <v-btn icon  color="#00BFA5"
 	      	@click="$router.push({
 	      		name : 'abandonedPet'
-	      	})"
+	      	}).catch(()=>{})"
 	      >
 	        <v-icon>mdi-paw</v-icon>
 	      </v-btn>
@@ -180,7 +182,7 @@ export default {
 			  that.$router.push({name: 'plainLogin'});
 		  }else{
 			  var loginId = that.$store.getters.getMbrId;
-			  that.$router.push({path: '/user/'+loginId});
+			  that.$router.push({path:'/user/'+loginId}).catch(()=>{});
 		  }
 	  }
 	  

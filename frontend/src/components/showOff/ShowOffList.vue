@@ -3,6 +3,7 @@
 	<div>
 		<v-layout row wrap>	
 			<v-flex xs12 sm6 md4 lg4 xl4
+					v-if="showOffList != null "
 					v-for="showOffObj in  showOffList" >
 			<v-card
 			    max-width="344"
@@ -11,43 +12,44 @@
 			    <v-list-item>
 			      <v-list-item-avatar color="grey">
 			      	<img
-			      		v-if="showOffObj.mbrJpa.mbrRpstImgUrl != null &&  showOffObj.mbrJpa.mbrRpstImgNm != null"
-			      		:src="showOffObj.mbrJpa.mbrRpstImgUrl + '/' + showOffObj.mbrJpa.mbrRpstImgNm"
-			      		@click="$router.push({path: '/user/'+showOffObj.mbrJpa.mbrId})"
+			      		v-if="showOffObj.showOffJpa.mbrJpa.mbrRpstImgUrl != null &&  showOffObj.showOffJpa.mbrJpa.mbrRpstImgNm != null"
+			      		:src="showOffObj.showOffJpa.mbrJpa.mbrRpstImgUrl + '/' + showOffObj.showOffJpa.mbrJpa.mbrRpstImgNm"
+			      		@click="$router.push({path: '/user/'+showOffObj.showOffJpa.mbrJpa.mbrId})"
 			      	>
 			      	<img
 			      		v-else
 			      		src="@/assets/emptyProfile2.png"
-			      		@click="$router.push({path: '/user/'+showOffObj.mbrJpa.mbrId})"
+			      		@click="$router.push({path: '/user/'+showOffObj.showOffJpa.mbrJpa.mbrId})"
 			      	>
 			      </v-list-item-avatar>
 			      <v-list-item-content>
-			        <v-list-item-title v-text="showOffObj.mbrJpa.mbrNickNm"></v-list-item-title>
-			        <v-list-item-subtitle v-text="timeForToday(showOffObj.regDt)"></v-list-item-subtitle> 
+			        <v-list-item-title v-text="showOffObj.showOffJpa.mbrJpa.mbrNickNm"></v-list-item-title>
+			        <v-list-item-subtitle v-text="timeForToday(showOffObj.showOffJpa.regDt)"></v-list-item-subtitle> 
 			      </v-list-item-content>
 			    </v-list-item>
-			    <template v-if="showOffObj.showOffAttachJpa.length > 1">
+			    <template v-if="showOffObj.showOffJpa.showOffAttachJpa.length > 1">
 			    	<swiper ref="mySwiper" 
 						class="swiper"
 						:options="swiperOptions" 
-						v-if="showOffObj.showOffAttachJpa != null" 
+						v-if="showOffObj.showOffJpa.showOffAttachJpa != null" 
 					> 
-					    <swiper-slide v-for="showOffAttachObj in showOffObj.showOffAttachJpa" >
+					    <swiper-slide v-for="showOffAttachObj in showOffObj.showOffJpa.showOffAttachJpa" >
 				    		 <v-img 
 						      :src="showOffAttachObj.showOffAttachUrl + '/' + showOffAttachObj.showOffAttachNm"
 						      height="295"
 						    ></v-img>
-					    </swiper-slide>
+					    </swiper-slide> <div class="swiper-pagination s01" slot="pagination"></div>
 				    </swiper>
-				    <div class="swiper-pagination" slot="pagination"></div>
+				    
+				   
 			    </template>
-			    <template v-else-if="showOffObj.showOffAttachJpa.length == 1">
+			    <template v-else-if="showOffObj.showOffJpa.showOffAttachJpa.length == 1">
 			    	<v-img 
-					      :src="showOffObj.showOffAttachJpa[0].showOffAttachUrl + '/' + showOffObj.showOffAttachJpa[0].showOffAttachNm"
+					      :src="showOffObj.showOffJpa.showOffAttachJpa[0].showOffAttachUrl + '/' + showOffObj.showOffJpa.showOffAttachJpa[0].showOffAttachNm"
 					      height="295"
 				    ></v-img>
 			    </template>
-			    <v-card-text v-html="getShoOffCont(showOffObj.showOffCont)">
+			    <v-card-text v-html="getShoOffCont(showOffObj.showOffJpa.showOffCont)">
 			    </v-card-text>
 			
 			    <v-card-actions>
@@ -60,9 +62,10 @@
 			      <v-btn
 			       color="#00BFA5"
 			        icon
-			        @click="sheet = !sheet; openReply(showOffObj.showOffSeq);"
+			        @click="sheet = !sheet; openReply(showOffObj.showOffJpa.showOffSeq);"
 			      >
 			       <v-icon>mdi-chat-outline</v-icon>	
+			       <span>{{showOffObj.replyCnt}}</span>
 			      </v-btn>
 			      <v-spacer></v-spacer>
 			    </v-card-actions>
@@ -113,7 +116,7 @@
 				<v-layout style="padding-left:7%">
 					<v-flex row wrap>
 							<v-avatar size="38">
-							<template v-if="mbrInfo != null">
+							<template v-if="isLogin && mbrInfo != null">
 								<img v-if="mbrInfo.mbrRpstImgUrl != null && mbrInfo.mbrRpstImgNm != null"
 					      		:src="mbrInfo.mbrRpstImgUrl +'/'+  mbrInfo.mbrRpstImgNm "
 						      	>
@@ -127,6 +130,7 @@
 								outlined
 								dense
 								style="padding-left:2%;"
+								color="#00BFA5"
 								v-model="replyCont"
 							>
 							</v-text-field>
@@ -144,7 +148,7 @@
 								id="addReplyBtn"
 								style="padding-left:9%;"
 								icon
-								color="blue"
+								color="#00BFA5"
 								@click="addShowOffReply()"
 								:disabled="btnDisabled"
 							>
@@ -196,6 +200,8 @@ import InfiniteLoading from 'vue-infinite-loading'
 import { getAuthAxios , getAuthCheckedAxios} from '@/interceptor/axiosInterceptor'
 import store from '@/store/store'
 import {mapGetters , mapActions} from 'vuex'
+import 'swiper/css/swiper.css'
+
 /*  import ShowOffReplyComponent from '@/components/showOff/ShowOffReplyComponent'*/
 
   export default {
@@ -215,11 +221,11 @@ import {mapGetters , mapActions} from 'vuex'
    			authAxios : getAuthCheckedAxios(),
    			sheet: false,
    			swiperOptions: {
-             slidesPerView: 1,
    	          pagination: {
-   	            el: '.swiper-pagination',
+   	            el: '.swiper-pagination.s01',
    	          },
-   			},
+   	          // Some Swiper option/callback...
+   	        },
    			show : false,
    			showOffList : [],
    			currentPage : 0,
@@ -398,8 +404,8 @@ import {mapGetters , mapActions} from 'vuex'
    		timeForToday : function(value) {
    			
    			var that = this;
-	   		var today = this.$moment()   
-	        var timeValue = this.$moment(value)  
+	   		var today = this.$moment.tz('Asia/Seoul');
+	        var timeValue = this.$moment(value).tz('Asia/Seoul');
 	        var betweenTime = Math.floor((today - timeValue) / 1000 / 60);
 	       
 	        if (betweenTime < 1) return '방금전';
@@ -417,7 +423,8 @@ import {mapGetters , mapActions} from 'vuex'
 	            return parseInt(betweenTimeDay) + '일전';
 	        }
 	        
-	        return Math.floor(betweenTimeDay / 365) + '년전';
+	        return Math.floor(betweenTimeDay / 365) + '년전'; 
+	        
 
    		},
    		renderDate : function(date){

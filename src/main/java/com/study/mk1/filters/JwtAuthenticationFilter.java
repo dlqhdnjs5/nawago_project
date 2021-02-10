@@ -11,10 +11,13 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.GenericFilterBean;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.study.mk1.common.JwtTokenProvider;
+import com.study.mk1.sequrity.SecurityUserDetailService;
+import com.study.mk1.sequrity.SecurityUserDetails;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,6 +25,9 @@ import lombok.RequiredArgsConstructor;
 public class JwtAuthenticationFilter extends GenericFilterBean{
 
 	private final JwtTokenProvider jwtTokenProvider;
+	
+	@Autowired
+	SecurityUserDetailService securityUserDetailService;
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
@@ -33,6 +39,12 @@ public class JwtAuthenticationFilter extends GenericFilterBean{
 			Authentication authentication = jwtTokenProvider.getAuthentication(token);
 			// SecurityContext 에 Authentication 객체를 저장합니다.
 			SecurityContextHolder.getContext().setAuthentication(authentication);
+			
+			UserDetails userDetails = securityUserDetailService.loadUserByUsername(jwtTokenProvider.getUserPk(token));
+			
+			jwtTokenProvider.createToken(userDetails.getUsername(), userDetails.getAuthorities());
+			
+			
 		}else {
 			SecurityContextHolder.getContext().setAuthentication(null);
 			
