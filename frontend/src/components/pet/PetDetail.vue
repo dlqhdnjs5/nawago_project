@@ -26,6 +26,17 @@
 						      <input id="fileId" type="file"	@input="upload" style="display : none;"/>
 						</v-avatar>
 					</v-badge>
+						<div>
+							<br>
+					      	 <v-progress-circular
+					      	  v-if="progress"
+						      :size="30"
+						      :width="7"
+						      color="#F48FB1"
+						      indeterminate
+						    
+							  ></v-progress-circular>
+					      </div>
 				</v-flex>
 				<v-flex xs12 lg12 md12 xl12
 					v-else
@@ -145,7 +156,7 @@
 <script>
 import router from '@/router/index.js'
 import {getAuthAxios , getAuthCheckedAxios} from '@/interceptor/axiosInterceptor'
-import {getFilExtCommon , ImgfileSizeCheckCommon} from '@/common/nawagoCommonJs'
+import {getImgFileExtCommon , ImgfileSizeCheckCommon} from '@/common/nawagoCommonJs'
 
   export default {
     name: 'PetDetail',
@@ -153,6 +164,7 @@ import {getFilExtCommon , ImgfileSizeCheckCommon} from '@/common/nawagoCommonJs'
 		return {
 			petSeq : this.$route.params.petSeq,
 			userId : this.$route.params.userId,
+			progress : false,
 			sheet: false,
 			valid: true,
 			files: [],
@@ -243,7 +255,7 @@ import {getFilExtCommon , ImgfileSizeCheckCommon} from '@/common/nawagoCommonJs'
 			var that = this;
 		   
 		    var $imgInput = document.querySelector('#fileId')
-		    if(!getFilExtCommon($imgInput.files[0])){
+		    if(!getImgFileExtCommon($imgInput.files[0])){
 				alert('이미지 파일만 등록 가능합니다.');
 				return ;
 			}
@@ -252,6 +264,8 @@ import {getFilExtCommon , ImgfileSizeCheckCommon} from '@/common/nawagoCommonJs'
 		    	alert('이미지는 최대 10MB 까지 등록 가능합니다.');
 				return ;
 		    }
+		    
+		    that.progress = true; //프로그레스 바 
 		    
 		    var fd = new FormData();
 		    fd.append('data',  $imgInput.files[0])
@@ -264,14 +278,15 @@ import {getFilExtCommon , ImgfileSizeCheckCommon} from '@/common/nawagoCommonJs'
 		      )
 		    .then( response => {
 		            var result = response.data;
-		            console.log(result)
 		            that.updateProfilePhoto(result);
+		            
 		           /*  that.petInfo.petImgNm = that.getRealFileName(result);
 		            that.petInfo.petImgUrl = that.getPetImgUrl(result); */
 		           
 	          })
 	          .catch(function () {
 	            console.log('FAILURE!!');
+	            that.progress = false;// 프로그래스 바
 	          });
 		},
 		delPetImg : async function(){//파일 삭제
@@ -312,9 +327,11 @@ import {getFilExtCommon , ImgfileSizeCheckCommon} from '@/common/nawagoCommonJs'
 	        	that.authAxios.post('/api/pet/update/petProfilePhoto',param )
 			    .then( response => {
 			    	that.getPetInfo();
+			    	 that.progress = false; //프로그레스 바 
 		         })
 		          .catch(function (err) {
 		        	alert('시스템 오류가 발생하였습니다.')
+		        	that.progress = false;// 프로그래스 바
 		            console.log('fail update profile');
 		         });
 	    },

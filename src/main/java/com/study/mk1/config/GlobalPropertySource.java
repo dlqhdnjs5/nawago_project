@@ -53,8 +53,58 @@ public class GlobalPropertySource {
     
     
     
+    /**
+     * email 
+     */
+    @Value("${spring.mail.host}")
+    private String mailHost;
     
-    public String getAccessKey() {
+    @Value("${spring.mail.port}")
+    private String mailPort;
+    
+    @Value("${spring.mail.username}")
+    private String mailId;
+    
+    @Value("${spring.mail.password}")
+    private String mailPw;
+    
+    /**
+     * abandoned
+     * @return
+     */
+    
+    @Value("${abandoned.api.key}")
+    private String abandonedApiKey;
+    
+    public String getAbandonedApiKey() {
+		return abandonedApiKey;
+	}
+
+	public String getAbandonedApiServerUrl() {
+		return abandonedApiServerUrl;
+	}
+
+	@Value("${abandoned.api.server.url}")
+    private String abandonedApiServerUrl;
+    
+    
+    public String getMailHost() {
+		return mailHost;
+	}
+
+	public String getMailPort() {
+		return mailPort;
+	}
+
+	public String getMailId() {
+		return mailId;
+	}
+
+	public String getMailPw() {
+		return mailPw;
+	}
+
+	public String getAccessKey() {
 		return accessKey;
 	}
 

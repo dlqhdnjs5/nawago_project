@@ -25,6 +25,17 @@
 			      <input id="fileId" type="file"	@input="upload" style="display : none;"/>
 			    </v-avatar>
 			    </v-badge>
+			   <div>
+				 <br>
+		      	 <v-progress-circular
+		      	  v-if="progress"
+			      :size="30"
+			      :width="7"
+			      color="#F48FB1"
+			      indeterminate
+			    
+				  ></v-progress-circular>
+		      </div>
 			</v-flex>
 			<v-flex xs12 v-else >
 				<v-avatar size="110">
@@ -183,12 +194,29 @@
 							:options="swiperOptions" 
 							v-if="myShowOffObj.showOffJpa.showOffAttachJpa != null" 
 						> 
-							<swiper-slide v-for="showOffAttachObj in myShowOffObj.showOffJpa.showOffAttachJpa" >
-								<v-img 
-									class="white--text align-end"
-									height="295"
-									:src="showOffAttachObj.showOffAttachUrl + '/' + showOffAttachObj.showOffAttachNm"
-								></v-img>
+							<swiper-slide v-for="(showOffAttachObj, conttIdx ) in myShowOffObj.showOffJpa.showOffAttachJpa" >
+								<template v-if="showOffAttachObj.showOffAttachTpCd == 'IMG'">
+									<v-img 
+										class="white--text align-end"
+										height="295"
+										:src="showOffAttachObj.showOffAttachUrl + '/' + showOffAttachObj.showOffAttachNm"
+									></v-img>
+								</template>
+								<template v-else >
+									<video
+								      	:id="'clientMov'+conttIdx"
+								      	class="video-js vjs-default-skin vjs-big-play-centerd" 
+								      	playsinline
+								      	style="margin:0 auto;height:295px"
+								      	controls
+								      	:src="showOffAttachObj.showOffAttachUrl + '/' + showOffAttachObj.showOffAttachNm"
+							      	>
+							      	</video>
+							      	<!-- autoplay  -->
+							      	<!-- muted="muted" -->
+							      	<!-- loop  -->
+								
+								</template>
 							</swiper-slide>
 							 <div class="swiper-pagination s01" slot="pagination"></div>
 						</swiper>
@@ -456,10 +484,12 @@
 <script>
 import { Swiper, SwiperSlide, directive } from 'vue-awesome-swiper'
 import { getAuthAxios , getAuthCheckedAxios} from '@/interceptor/axiosInterceptor'
-import {getFilExtCommon , ImgfileSizeCheckCommon} from '@/common/nawagoCommonJs'
+import {getImgFileExtCommon , ImgfileSizeCheckCommon} from '@/common/nawagoCommonJs'
 import {mapGetters , mapActions} from 'vuex'
 import store from '@/store/store'
 import 'swiper/css/swiper.css'
+import videojs from 'video.js';
+import 'video.js/dist/video-js.css'
 
   export default {
     name: 'myPage',
@@ -472,6 +502,7 @@ import 'swiper/css/swiper.css'
     		isMySelf : false,
     		userId : this.$route.params.userId,
     		profilePhotoYn : false,
+    		progress : false,
     		myInfo : {
     			mbrId : null,
     			mbrEmail : null,
@@ -620,7 +651,7 @@ import 'swiper/css/swiper.css'
    			var that = this;
 			var $imgInput = document.querySelector('#fileId');
 			
-			if(!getFilExtCommon($imgInput.files[0])){
+			if(!getImgFileExtCommon($imgInput.files[0])){
 				alert('이미지 파일만 등록 가능합니다.');
 				return ;
 			}
@@ -629,6 +660,8 @@ import 'swiper/css/swiper.css'
 		    	alert('이미지는 최대 10MB 까지 등록 가능합니다.');
 				return ;
 		    }
+			
+			that.progress = true;// 프로그래스 바
 			
 		    var fd = new FormData();
 		    fd.append('data', $imgInput.files[0]);
@@ -645,6 +678,7 @@ import 'swiper/css/swiper.css'
 		    	that.updateProfilePhoto(imgUrl);
 	         })
 	          .catch(function (err) {
+	        	that.progress = false;// 프로그래스 바
 	        	alert('시스템 오류가 발생하였습니다.')
 	            console.log('fail upload');
 	         });
@@ -660,8 +694,10 @@ import 'swiper/css/swiper.css'
 		    .then( response => {
 		    	var imgResult = response.data;
 		    	that.getMbrInfo();
+		    	that.progress = false;// 프로그래스 바
 	         })
 	          .catch(function (err) {
+	        	that.progress = false;// 프로그래스 바
 	        	alert('시스템 오류가 발생하였습니다.')
 	            console.log('fail update profile');
 	         });

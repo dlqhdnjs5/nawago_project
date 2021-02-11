@@ -34,12 +34,54 @@
 	 				:rules = "nicknameRules"
 	 				label ="*닉네임">
 	 			</v-text-field>
-	 			<v-text-field
-	 				v-model="mbrEmail"
-	 				color="#00BFA5"
-	 				:rules ="mbrEmailRules"
-	 				label ="*이메일">
-	 			</v-text-field>
+	 			<v-flex>
+		 			<v-text-field
+		 				id="mbrEmailAuth"
+		 				v-model="mbrEmail"
+		 				color="#00BFA5"
+		 				:rules ="mbrEmailRules"
+		 				label ="*이메일">
+		 			</v-text-field>
+		 			<span v-if="mailStat == 'finish'" style="color:#00BFA5;">인증 성공</span>
+		 			<div 	v-if="mailStat == 'before'">
+			 			<v-btn block  depressed color="#00BFA5" dark
+				 			small
+				 			width="20px"
+				 			@click="sendAuthMail"
+			 			>
+			 				인증메일 보내기
+			 			</v-btn>
+		 			</div>
+		 			<div v-if="mailStat == 'after'">
+		 				<br>
+		 				<v-text-field
+		 				v-model="emailAuthInput"
+			            label="인증번호"
+			            dense
+			            outlined
+			            color="#00BFA5"
+				        ></v-text-field>
+				        <v-btn block  depressed color="#F48FB1" dark
+				 			small
+				 			width="20px"
+				 			@click="checkAuthEmail"
+			 			>
+		 				확인
+		 			</v-btn>
+		 			</div>
+		 			<div v-if="mailStat == 'after'">
+		 				<br>
+			 			<v-btn block  depressed color="#F48FB1" dark
+			 				
+				 			small
+				 			width="20px"
+				 			@click="initAuthMail"
+			 			>
+			 				인증메일 재전송
+			 			</v-btn>
+		 			</div>
+		 			
+	 			</v-flex>
 	 			<v-text-field
 	 				v-model="name"
 	 				color="#00BFA5"
@@ -84,6 +126,11 @@ import router from '@/router/index.js'
 		return {
 			valid: true,
 			snackbar: false,
+			authEmail : false,
+			mailStat : 'before',
+			receivedAuthEmailNum : null, //수신받은 인증번호  
+			emailAuthInput : null, //인증번호 입력란의 인증번호
+			emailAuthSuccess: false,
 		    text: '',
 			mbrId : '',
 			password : '',
@@ -123,9 +170,22 @@ import router from '@/router/index.js'
 	},
 	methods : {
 		joinMbr () {
-			
 			var that = this;
 			if(this.$refs.form.validate()){
+				
+			   if(that.emailAuthSuccess == false){
+		 		   that.text = '이메일 인증이 필요합니다.'
+		 		   that.mbrEmail='';
+		 		   that.snackbar = true;
+		 		   return false;
+		 	   }
+			   
+			   if(that.passwordConfirm != that.password){
+				   that.text = '비밀번호를 확인해주세요'
+			 	   that.mbrEmail='';
+			 	   that.snackbar = true;
+			 	   return false;
+			   }
 	    	   
 	    	   that.isExistMbrId()
 	    	   .then(function(resp){
@@ -161,12 +221,17 @@ import router from '@/router/index.js'
 	    			   that.text = '이메일이 중복되었습니다.'
 	    			   that.mbrEmail='';
 	    			   that.snackbar = true;
+	    			   
+	    			   
+	    			   that.initAuthMail();
+	    			   
+	    			   
 	    		   }else if(resp=='NICKNM'){
 	    			   that.text = '닉네임이 중복되었습니다.'
 	    			   that.nickname='';
 	    			   that.snackbar = true;
-	    			   
 	    		   }
+	    	   	   
 	    	    })
 	    	   .catch(function(err){
 	       			console.log(err)
@@ -212,7 +277,61 @@ import router from '@/router/index.js'
 					resolve(result)
 				})
 			}); 
-		}
+		},
+		sendAuthMail : function(){
+			var that = this;
+			var mbrEmail = that.mbrEmail;
+			
+			mbrEmail = mbrEmail.trim();
+			
+			if(mbrEmail.length < 1){
+				that.text = '이메일을 입력해 주세요'
+	    		that.snackbar = true;
+				return;
+			}
+			that.mailStat = 'after' //이메일 확인버튼 '보낸 후 '로  노출
+			
+			document.querySelector("#mbrEmailAuth").readOnly = true;
+			var param = {
+					mbrEmail 	: that.mbrEmail
+			}
+			axios.post('/api/sendAuthEmail',param)
+			.then(function(resp){
+				that.receivedAuthEmailNum = resp.data;
+				
+			})
+			.catch(function(err){
+				console.log(err)
+			});
+			
+		},
+		checkAuthEmail : function(){ //인증번호 확인
+			var that = this;
+			var authNum = that.emailAuthInput;
+			
+			if(authNum == null || authNum.trim() < 1){
+				that.text = '인증번호를 입력해주세요.'
+		    	that.snackbar = true;
+				return;
+			}
+			
+			if(that.receivedAuthEmailNum ==  that.emailAuthInput ){
+				that.emailAuthSuccess = true;
+				that.mailStat = 'finish';
+			}else{
+				that.text = '인증번호를 확인해주세요.'
+	    		that.snackbar = true;
+				return;
+			}
+		},
+		initAuthMail : function(){ //인증번호 재전송
+			var that = this;
+			that.mailStat = 'before'; // 이메일 상태 변경
+			that.emailAuthInput = null; // 인증번호 입력란 초기화
+			that.mbrEmail = null; // 이메일 초기화
+			that.emailAuthSuccess = false; //이메일 success 초기화
+			document.querySelector("#mbrEmailAuth").readOnly = false;  //이메일 readOnly 초기화
+		},
 	},
 	created : function(){
 		

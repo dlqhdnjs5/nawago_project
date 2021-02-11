@@ -168,7 +168,7 @@
 <script>
 import router from '@/router/index.js'
 import {getAuthAxios} from '@/interceptor/axiosInterceptor'
-import {getFilExtCommon , ImgfileSizeCheckCommon} from '@/common/nawagoCommonJs'
+import {getImgFileExtCommon , ImgfileSizeCheckCommon} from '@/common/nawagoCommonJs'
 
   export default {
     name: 'RegisterPage',
@@ -231,7 +231,7 @@ import {getFilExtCommon , ImgfileSizeCheckCommon} from '@/common/nawagoCommonJs'
 		    var fd = new FormData();
 		    var $imgInput = document.querySelector('#fileId')
 		    
-		    if(!getFilExtCommon($imgInput.files[0])){
+		    if(!getImgFileExtCommon($imgInput.files[0])){
 				alert('이미지 파일만 등록 가능합니다.');
 				return ;
 			}

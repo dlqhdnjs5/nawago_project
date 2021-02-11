@@ -1,5 +1,6 @@
 <template>
-<div>
+
+<div class="showOffList">
 	<div>
 		<v-layout row wrap>	
 			<v-flex xs12 sm6 md4 lg4 xl4
@@ -32,12 +33,31 @@
 						class="swiper"
 						:options="swiperOptions" 
 						v-if="showOffObj.showOffJpa.showOffAttachJpa != null" 
+						@slideChange="slideChanged(swiper)"
 					> 
-					    <swiper-slide v-for="showOffAttachObj in showOffObj.showOffJpa.showOffAttachJpa" >
-				    		 <v-img 
-						      :src="showOffAttachObj.showOffAttachUrl + '/' + showOffAttachObj.showOffAttachNm"
-						      height="295"
-						    ></v-img>
+					    <swiper-slide v-for="(showOffAttachObj , conttIdx ) in showOffObj.showOffJpa.showOffAttachJpa" >
+					    
+					    	<template v-if="showOffAttachObj.showOffAttachTpCd == 'IMG'">
+						    	<v-img 
+							      :src="showOffAttachObj.showOffAttachUrl + '/' + showOffAttachObj.showOffAttachNm"
+							      height="295"
+							    ></v-img>
+					    	</template>
+					    	 <template v-else>
+						    	<video
+							      	:id="'clientMov'+conttIdx"
+							      	class="video-js vjs-default-skin vjs-big-play-centerd" 
+							      	playsinline
+							      	style="margin:0 auto;height:295px;width:344px;"
+							      	controls
+							      	:src="showOffAttachObj.showOffAttachUrl + '/' + showOffAttachObj.showOffAttachNm"
+							      	
+						      	>
+						      	</video>
+						      	<!-- autoplay  -->
+						      	<!-- muted="muted" -->
+						      	<!-- loop  -->
+					    	</template> 
 					    </swiper-slide> <div class="swiper-pagination s01" slot="pagination"></div>
 				    </swiper>
 				    
@@ -201,8 +221,8 @@ import { getAuthAxios , getAuthCheckedAxios} from '@/interceptor/axiosIntercepto
 import store from '@/store/store'
 import {mapGetters , mapActions} from 'vuex'
 import 'swiper/css/swiper.css'
-
-/*  import ShowOffReplyComponent from '@/components/showOff/ShowOffReplyComponent'*/
+import videojs from 'video.js';
+import 'video.js/dist/video-js.css'
 
   export default {
     name: 'ShowOffList',
@@ -213,7 +233,6 @@ import 'swiper/css/swiper.css'
     	/* ShowOffReplyComponent */
     },
     directives: {
-        swiper: directive
     },
    	data : function(){
    		return {
@@ -240,7 +259,7 @@ import 'swiper/css/swiper.css'
    	},
    	computed: {
         swiper() {
-          return this.$refs.mySwiper.$swiper
+          return this.$refs.mySwiper.swiper
         },
         ...mapGetters({
    			mbrInfo : 'getMbrInfo',
@@ -260,6 +279,15 @@ import 'swiper/css/swiper.css'
    		window.addEventListener('scroll', function(){
    			that.bottom = that.bottomVisible()
         });
+   		
+   		setTimeout(function(){
+   			console.log( that.$refs.mySwiper)
+   			var mySwiper = that.$refs.mySwiper;
+   			
+   			
+   			
+   		},1000);
+   		
    	},
    	watch: {
    	    bottom(bottom) {
@@ -347,6 +375,8 @@ import 'swiper/css/swiper.css'
   			})
   			.then(resp =>{
   				that.showOffList =  resp;
+  				console.log(that.showOffList)
+  				
   			})
   			.catch(err => {
   				console.log("pageGetter error");
@@ -439,6 +469,11 @@ import 'swiper/css/swiper.css'
    		},
    		getShoOffCont : function(shoOffCont){
 			return shoOffCont.replaceAll('\n','</br>');
+   		},
+   		slideChanged : function(event){
+   			
+   			console.log(this.swiper)
+   			console.log('whatws')
    		}
    		
    	}

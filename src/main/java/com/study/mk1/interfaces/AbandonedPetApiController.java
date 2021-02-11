@@ -8,15 +8,18 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -28,6 +31,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.study.mk1.config.GlobalPropertySource;
 import com.study.mk1.data.AbandonedPetDTO;
 import com.study.mk1.jpa.showOffReply.ShowOffReplyJpa;
 
@@ -38,20 +42,29 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AbandonedPetApiController {
 	
-	private static final String key = "dmvr4zhgUd1LgEmKvbN%2BME8PEOBi1O2WlWtocqqgHwuNrTrOedgWIhUfD8EOrptDCqpRMn0VfDWRQ8qSfSqJqA%3D%3D";
+	@Autowired
+	GlobalPropertySource gp;
+	
+	private static String KEY;
 
-	private static final String serviceUrl = "http://openapi.animal.go.kr/openapi/service/rest/abandonmentPublicSrvc/abandonmentPublic";
+	private static String SERVICE_URL;
 	
 	private static final String pagePerView = "8";
 	
+	
+	@PostConstruct
+	protected void init() {	
+		SERVICE_URL = gp.getAbandonedApiServerUrl();
+		KEY = gp.getAbandonedApiKey();
+	}
 	
 	@RequestMapping("/getAbandonedPetInfo")
 	public ResponseEntity<List<AbandonedPetDTO>> getAbandonedPetInfo(HttpServletRequest rq, HttpServletResponse rs,@RequestParam(value="page") String pageNo) throws Exception {
 	
         
         List<Map<String,String>> resultList  = new ArrayList<>();
-        StringBuilder urlBuilder = new StringBuilder(serviceUrl); 
-        urlBuilder.append("?" + URLEncoder.encode("ServiceKey","UTF-8") + "="+key);
+        StringBuilder urlBuilder = new StringBuilder(SERVICE_URL); 
+        urlBuilder.append("?" + URLEncoder.encode("ServiceKey","UTF-8") + "="+KEY);
         urlBuilder.append("&" + URLEncoder.encode("numOfRows","UTF-8") + "="+pagePerView);
         urlBuilder.append("&" + URLEncoder.encode("pageNo","UTF-8") + "="+pageNo);
         URL url = new URL(urlBuilder.toString());

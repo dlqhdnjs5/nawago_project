@@ -118,7 +118,7 @@ public class IOService {
     	extension = extension.toLowerCase();
     	
     	String imgExts = "jpg,png,jpeg,pdf";
-    	String movExts = "mp4,mov,avi";
+    	String movExts = "mp4,mov,avi,webm,ogg";
     	
     	if(movExts.contains(extension)) {
     		return ShowOffAttachEnum.TpCd.MOV.toString();

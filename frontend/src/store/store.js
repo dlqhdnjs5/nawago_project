@@ -116,7 +116,6 @@ export default new Vuex.Store({
 			commit('loginError');
 		},
 		login : ({dispatch,commit},param) => {
-			console.log('login start')
 			axios.post('/api/loginProcesse', param )
 			.then(function(resp){
 				

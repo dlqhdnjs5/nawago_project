@@ -424,7 +424,7 @@
 <script>
 import { Swiper, SwiperSlide, directive } from 'vue-awesome-swiper'
 import { getAuthAxios , getAuthCheckedAxios} from '@/interceptor/axiosInterceptor'
-import {getFilExtCommon , ImgfileSizeCheckCommon} from '@/common/nawagoCommonJs'
+import {getImgFileExtCommon , ImgfileSizeCheckCommon} from '@/common/nawagoCommonJs'
 import store from '@/store/store'
   export default {
     name: 'myPage',
@@ -563,7 +563,7 @@ import store from '@/store/store'
    			var that = this;
 			var $imgInput = document.querySelector('#fileId');
 			
-			if(!getFilExtCommon($imgInput.files[0])){
+			if(!getImgFileExtCommon($imgInput.files[0])){
 				alert('이미지 파일만 등록 가능합니다.');
 				return ;
 			}
