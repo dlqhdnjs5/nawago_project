@@ -391,7 +391,7 @@ import 'video.js/dist/video-js.css'
 	         const pageHeight = document.documentElement.scrollHeight
 	         const bottomOfPage = visible + scrollY <= pageHeight
 	         
-	         if(scrollY < -200 && visible < 800){
+	         if(scrollY < -145 && visible < 800){
 	        	 that.topLoading = true;
 	        	 that.getFirstShowOffListPage();
 	         }
@@ -411,6 +411,7 @@ import 'video.js/dist/video-js.css'
   			})
   			.catch(err => {
   				console.log("pageGetter error");
+  				that.topLoading = false;
   			})
   			
 		},

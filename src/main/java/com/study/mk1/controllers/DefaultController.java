@@ -132,7 +132,7 @@ public class DefaultController {
         		return new ResponseEntity<String>("올바른 비밀번호를 입력해 주세요.",HttpStatus.UNAUTHORIZED);
         	}
         	if(mbrJpa.getMbrStatCd().equals(MbrEnum.StatCd.FSCSI.toString())) {
-        		return new ResponseEntity<String>("너는시발럼아 부적절한 행위로 강제탈퇴 되었습니다.알겠니? 꺼져",HttpStatus.UNAUTHORIZED);
+        		return new ResponseEntity<String>("부적절한 행위로 강제탈퇴 되었습니다.",HttpStatus.UNAUTHORIZED);
         	}
         	return new ResponseEntity<String>(jwtTokenProvider.createToken(userDetail.getUsername(), userDetail.getAuthorities()), HttpStatus.OK);
     	}
