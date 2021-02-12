@@ -101,19 +101,6 @@ public class DefaultController {
 		
 	}
 	
-	/*@RequestMapping(value= {"/login"})
-	public String login(HttpServletRequest rquest , HttpServletResponse response ,
-			@RequestParam(value= "error",required=false) String error)  {
-		
-		if(error != null) {
-			return "display/loginFail";
-		}else {
-			return "display/login";
-			
-		}
-		
-	}*/
-	
 	// 로그인
     @PostMapping("/loginProcesse")
     @ResponseBody
@@ -130,6 +117,9 @@ public class DefaultController {
         	}
         	if (!passwordEncoder.matches(user.get("password"), userDetail.getPassword())) {
         		return new ResponseEntity<String>("올바른 비밀번호를 입력해 주세요.",HttpStatus.UNAUTHORIZED);
+        	}
+        	if(mbrJpa.getMbrStatCd().equals(MbrEnum.StatCd.SCSI.toString())) {
+        		return new ResponseEntity<String>("비활성화된 계정 입니다.",HttpStatus.UNAUTHORIZED);
         	}
         	if(mbrJpa.getMbrStatCd().equals(MbrEnum.StatCd.FSCSI.toString())) {
         		return new ResponseEntity<String>("부적절한 행위로 강제탈퇴 되었습니다.",HttpStatus.UNAUTHORIZED);
