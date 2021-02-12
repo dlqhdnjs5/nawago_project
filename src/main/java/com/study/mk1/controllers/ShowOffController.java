@@ -162,7 +162,6 @@ public class ShowOffController {
 	public ResponseEntity<List<ShowOffReplyJpa>> getShowOffReplyList( HttpServletRequest req,HttpServletResponse res,
 			 @RequestParam(value="showOffSeq") String showOffSeq ) {
 		try {
-			
 			List<ShowOffReplyJpa> list = showOffJpaCustomRepository.showOffReplyfindByMbrSeq(Long.parseLong(showOffSeq));
 			return new ResponseEntity<List<ShowOffReplyJpa>>(list,HttpStatus.OK);
 		

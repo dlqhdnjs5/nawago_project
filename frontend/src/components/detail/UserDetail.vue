@@ -208,8 +208,9 @@
 								      	class="video-js vjs-default-skin vjs-big-play-centerd" 
 								      	playsinline
 								      	style="margin:0 auto;height:295px"
+								      	preload="metadata" 
 								      	controls
-								      	:src="showOffAttachObj.showOffAttachUrl + '/' + showOffAttachObj.showOffAttachNm"
+								      	:src="showOffAttachObj.showOffAttachUrl + '/' + showOffAttachObj.showOffAttachNm +'#t=0.5'"
 							      	>
 							      	</video>
 							      	<!-- autoplay  -->
@@ -222,11 +223,25 @@
 						</swiper>
 					</template>
 					<template  v-else-if="myShowOffObj.showOffJpa.showOffAttachJpa.length == 1">
-						<v-img 
+						<template v-if="myShowOffObj.showOffJpa.showOffAttachJpa[0].showOffAttachTpCd == 'IMG'">
+							<v-img 
 							class="white--text align-end"
 							height="295"
 							:src="myShowOffObj.showOffJpa.showOffAttachJpa[0].showOffAttachUrl + '/' + myShowOffObj.showOffJpa.showOffAttachJpa[0].showOffAttachNm"
-						></v-img>
+							></v-img>
+						</template>
+						<template v-else>
+							<video
+						      	class="video-js vjs-default-skin vjs-big-play-centerd" 
+						      	playsinline
+						      	style="margin:0 auto;height:295px;width:344px;"
+						      	controls
+						      	preload="metadata"
+						      	:src="myShowOffObj.showOffJpa.showOffAttachJpa[0].showOffAttachUrl + '/' + myShowOffObj.showOffJpa.showOffAttachJpa[0].showOffAttachNm +'#t=0.5'"
+					      	>
+					      	</video>
+						</template>
+						
 					</template>
 					
 						<!-- <v-card-title>Top 10 Australian beaches</v-card-title> -->

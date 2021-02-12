@@ -1,6 +1,16 @@
 <template>
 
 <div class="showOffList">
+	<div class="text-center">
+			<v-layout v-if="topLoading" xs12 sm12 md12 lg12 xl12 >
+				<v-flex>
+					<v-progress-circular
+				      indeterminate
+				      color="#00BFA5"
+				    ></v-progress-circular>
+				</v-flex>
+			</v-layout>
+	</div>
 	<div>
 		<v-layout row wrap>	
 			<v-flex xs12 sm6 md4 lg4 xl4
@@ -36,7 +46,6 @@
 						@slideChange="slideChanged(swiper)"
 					> 
 					    <swiper-slide v-for="(showOffAttachObj , conttIdx ) in showOffObj.showOffJpa.showOffAttachJpa" >
-					    
 					    	<template v-if="showOffAttachObj.showOffAttachTpCd == 'IMG'">
 						    	<v-img 
 							      :src="showOffAttachObj.showOffAttachUrl + '/' + showOffAttachObj.showOffAttachNm"
@@ -47,11 +56,11 @@
 						    	<video
 							      	:id="'clientMov'+conttIdx"
 							      	class="video-js vjs-default-skin vjs-big-play-centerd" 
+							      	preload="metadata" 
 							      	playsinline
 							      	style="margin:0 auto;height:295px;width:344px;"
 							      	controls
-							      	:src="showOffAttachObj.showOffAttachUrl + '/' + showOffAttachObj.showOffAttachNm"
-							      	
+							      	:src="showOffAttachObj.showOffAttachUrl + '/' + showOffAttachObj.showOffAttachNm +'#t=0.5'"
 						      	>
 						      	</video>
 						      	<!-- autoplay  -->
@@ -60,14 +69,26 @@
 					    	</template> 
 					    </swiper-slide> <div class="swiper-pagination s01" slot="pagination"></div>
 				    </swiper>
-				    
-				   
 			    </template>
 			    <template v-else-if="showOffObj.showOffJpa.showOffAttachJpa.length == 1">
-			    	<v-img 
+			    	<template v-if="showOffObj.showOffJpa.showOffAttachJpa[0].showOffAttachTpCd == 'IMG'">
+			    		<v-img 
 					      :src="showOffObj.showOffJpa.showOffAttachJpa[0].showOffAttachUrl + '/' + showOffObj.showOffJpa.showOffAttachJpa[0].showOffAttachNm"
 					      height="295"
-				    ></v-img>
+				   	 ></v-img>
+			    	</template>
+			    	<template v-else>
+	    				<video
+					      	class="video-js vjs-default-skin vjs-big-play-centerd" 
+					      	playsinline
+					      	preload="metadata" 
+					      	style="margin:0 auto;height:295px;width:344px;"
+					      	controls
+					      	:src="showOffObj.showOffJpa.showOffAttachJpa[0].showOffAttachUrl + '/' + showOffObj.showOffJpa.showOffAttachJpa[0].showOffAttachNm +'#t=0.5'"
+				      	>
+				      	</video>
+			    	</template>
+			    	
 			    </template>
 			    <v-card-text v-html="getShoOffCont(showOffObj.showOffJpa.showOffCont)">
 			    </v-card-text>
@@ -250,6 +271,7 @@ import 'video.js/dist/video-js.css'
    			currentPage : 0,
    			listPageSize : 6,
    			loading : false,
+   			topLoading : false,
    			bottom: false,
    			currentShowOffSeq : null,
    			replyCont : null,
@@ -276,16 +298,14 @@ import 'video.js/dist/video-js.css'
    	},
    	mounted : function() {
    		var that = this;
+   		
    		window.addEventListener('scroll', function(){
    			that.bottom = that.bottomVisible()
+   			that.topVisible();
         });
    		
    		setTimeout(function(){
-   			console.log( that.$refs.mySwiper)
    			var mySwiper = that.$refs.mySwiper;
-   			
-   			
-   			
    		},1000);
    		
    	},
@@ -362,12 +382,24 @@ import 'video.js/dist/video-js.css'
          const pageHeight = document.documentElement.scrollHeight - 110
          const bottomOfPage = visible + scrollY >= pageHeight
          return bottomOfPage || pageHeight < visible
-         
+		},
+		topVisible : function(){
+			
+			var that = this;
+	         const scrollY = window.scrollY
+	         const visible = document.documentElement.clientHeight
+	         const pageHeight = document.documentElement.scrollHeight
+	         const bottomOfPage = visible + scrollY <= pageHeight
+	         
+	         if(scrollY < -200 && visible < 800){
+	        	 that.topLoading = true;
+	        	 that.getFirstShowOffListPage();
+	         }
+	         
 		},
 		getFirstShowOffListPage: function(){ //처음 인입시 리스트 로드
-   			
   			var that = this;
-  	   		
+  			that.showOffList = [];
   			this.$store.dispatch('PageGetter',{
   				url : '/api/showOff/list',
   				size : that.listPageSize,
@@ -375,8 +407,7 @@ import 'video.js/dist/video-js.css'
   			})
   			.then(resp =>{
   				that.showOffList =  resp;
-  				console.log(that.showOffList)
-  				
+  				that.topLoading = false;
   			})
   			.catch(err => {
   				console.log("pageGetter error");
@@ -471,9 +502,6 @@ import 'video.js/dist/video-js.css'
 			return shoOffCont.replaceAll('\n','</br>');
    		},
    		slideChanged : function(event){
-   			
-   			console.log(this.swiper)
-   			console.log('whatws')
    		}
    		
    	}

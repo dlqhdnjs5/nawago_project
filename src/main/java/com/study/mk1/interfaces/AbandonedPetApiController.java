@@ -68,17 +68,17 @@ public class AbandonedPetApiController {
         urlBuilder.append("&" + URLEncoder.encode("numOfRows","UTF-8") + "="+pagePerView);
         urlBuilder.append("&" + URLEncoder.encode("pageNo","UTF-8") + "="+pageNo);
         URL url = new URL(urlBuilder.toString());
-
+        List<AbandonedPetDTO> dto = new ArrayList<>();
+        try {
+        	
+       
         DocumentBuilderFactory dbFactoty = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactoty.newDocumentBuilder();
         Document doc = dBuilder.parse(url.toString());
         
         doc.getDocumentElement().normalize();
         NodeList nList = doc.getElementsByTagName("item");
-        System.out.println("파싱할 리스트 수 : "+ nList.getLength()); 
-        
-        List<AbandonedPetDTO> dto = new ArrayList<>();
-        
+       
         
         for(int temp = 0; temp < nList.getLength(); temp++){		
         	Node nNode = nList.item(temp);
@@ -87,16 +87,6 @@ public class AbandonedPetApiController {
         		Map result = new HashMap();
         		
         		Element eElement = (Element) nNode;
-        		
-        		log.info("날짜 : " +getTagValue("age", eElement));
-        		log.info("시도명 : " +getTagValue("careAddr", eElement));
-        		log.info("확진자수 : "  +getTagValue("careNm", eElement));
-        		log.info("사망자수 : "+getTagValue("careTel", eElement));
-        		log.info("격리자 수 : "  +getTagValue("chargeNm", eElement));
-        		log.info("격리 해제 수 : "  +getTagValue("colorCd", eElement));
-        		log.info("전일대비 증감수 : "+getTagValue("desertionNo", eElement));
-        		log.info("##############################");
-        		
         		obj.setNoticeEdt(getTagValue("noticeEdt", eElement));
         		obj.setNoticeSdt(getTagValue("noticeSdt", eElement));
         		obj.setPopfile(getTagValue("popfile", eElement));
@@ -118,11 +108,14 @@ public class AbandonedPetApiController {
         		obj.setWeight(getTagValue("weight", eElement));
         		
         		dto.add(obj);
-        		
     
         	}	
         }
         
+        }catch(Exception e) {
+        	log.error(e.toString());
+        	return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         return new ResponseEntity<List<AbandonedPetDTO>>(dto,HttpStatus.OK);
         
 	}
