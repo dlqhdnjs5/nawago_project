@@ -47,7 +47,6 @@ import com.study.mk1.cmp.repositorys.MbrRepository;
 import com.study.mk1.common.IOService;
 import com.study.mk1.common.JwtTokenProvider;
 import com.study.mk1.common.S3service;
-import com.study.mk1.common.S3uploader;
 import com.study.mk1.config.GlobalPropertySource;
 import com.study.mk1.data.MbrInfoDTO;
 import com.study.mk1.entity.Mbr;

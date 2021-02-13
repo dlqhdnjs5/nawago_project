@@ -32,7 +32,6 @@ import lombok.RequiredArgsConstructor;
 public class JwtTokenProvider {
 	
 	//TODO : 설정파일로 뺄것
-	//private  String SECRETKEY = "secret-web-token-key";
 	private  String SECRETKEY;
 //	private  long EXPIRATION_MS = 1000 * 60 * 60 * 24; 
 	private  long EXPIRATION_MS = 1000 * 60 * 60 ; 
@@ -95,7 +94,6 @@ public class JwtTokenProvider {
 		return  mbrJpaRepository.findByMbrId(mbrId);
 	}
 	
-	// Request의 Header에서 token 값을 가져옵니다. "x-auth" : "TOKEN값'
 	public String resolveToken(HttpServletRequest request) {
 		return request.getHeader(gp.getAuthHeader());
 	}
