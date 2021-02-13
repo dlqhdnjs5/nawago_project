@@ -33,7 +33,6 @@ public class JwtTokenProvider {
 	
 	//TODO : 설정파일로 뺄것
 	private  String SECRETKEY;
-//	private  long EXPIRATION_MS = 1000 * 60 * 60 * 24; 
 	private  long EXPIRATION_MS = 1000 * 60 * 60 ; 
 	
 	private final UserDetailsService userDetailsService;
