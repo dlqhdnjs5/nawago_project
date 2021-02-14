@@ -22,7 +22,7 @@ public interface ShowOffJpaCustomRepository {
 	
 	public List<ShowOffReplyJpa> showOffReplyfindByMbrSeq(long showOffSeq);
 
-	public List<ShowOffResult> findByShowOffPagingV2(Pageable pageable);
+	public List<ShowOffResult> findByShowOffPagingV2(long mbrSeq,Pageable pageable);
 	
 	
 }

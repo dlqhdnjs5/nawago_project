@@ -23,6 +23,7 @@ import com.study.mk1.data.ShowOffResult;
 import com.study.mk1.enums.MbrEnum;
 import com.study.mk1.enums.ShowOffEnum;
 import com.study.mk1.jpa.mbr.QMbrJpa;
+import com.study.mk1.jpa.showOffLike.QShowOffLikeJpa;
 import com.study.mk1.jpa.showOffReply.QShowOffReplyJpa;
 import com.study.mk1.jpa.showOffReply.ShowOffReplyJpa;
 
@@ -35,6 +36,10 @@ public class ShowOffJpaCustomRepositoryImpl  implements ShowOffJpaCustomReposito
     private EntityManager em;
 	
 	
+	/**
+	 * 스토리 리스트 조회 
+	 * TODO : 삭제예정
+	 */
 	@Override
 	public List<ShowOffJpa> findByShowOffStatCd() {
 		
@@ -47,6 +52,10 @@ public class ShowOffJpaCustomRepositoryImpl  implements ShowOffJpaCustomReposito
 		
 	}
 	
+	/**
+	 * 스토리 리스트 조회 
+	 * TODO : 삭제예정
+	 */
 	@Override
 	public List<ShowOffJpa> findByShowOffPaging(Pageable pageable) {
 		
@@ -60,11 +69,16 @@ public class ShowOffJpaCustomRepositoryImpl  implements ShowOffJpaCustomReposito
 				.list(qShowOffJpa);
 	}
 	
+	
+	/**
+	 * 스토리 리스트 페이징 조회
+	 */
 	@Override
-	public List<ShowOffResult> findByShowOffPagingV2(Pageable pageable) {
+	public List<ShowOffResult> findByShowOffPagingV2(long mbrSeq,Pageable pageable) {
 		
 		QShowOffJpa qShowOffJpa = QShowOffJpa.showOffJpa;
 		QShowOffReplyJpa qShowOffReplyJpa = QShowOffReplyJpa.showOffReplyJpa;
+		QShowOffLikeJpa qShowOffLikeJpa = QShowOffLikeJpa.showOffLikeJpa;
 		QMbrJpa qMbrJpa = QMbrJpa.mbrJpa;
 		JPAQuery query = new JPAQuery(em);
 		
@@ -85,15 +99,27 @@ public class ShowOffJpaCustomRepositoryImpl  implements ShowOffJpaCustomReposito
 							.from(qShowOffReplyJpa)
 							.where(qShowOffJpa.showOffSeq.eq(qShowOffReplyJpa.showOffSeq))
 							.count().as("replyCnt")
+							,new JPASubQuery()
+							.from(qShowOffLikeJpa)
+							.where(qShowOffJpa.showOffSeq.eq(qShowOffLikeJpa.showOffSeq))
+							.count().as("likeCnt")
+							,new JPASubQuery()
+							.from(qShowOffLikeJpa)
+							.where(qShowOffLikeJpa.mbrSeq.eq(mbrSeq).and(qShowOffJpa.showOffSeq.eq(qShowOffLikeJpa.showOffSeq)))
+							.count().as("myLike")
 						)
 					);
 	}
 	
+	/**
+	 * 마이 스토리 리스트 페이징 조회
+	 */
 	@Override
 	public List<ShowOffResult> findByMbrSeqPagingV2(long mbrSeq, Pageable pageable) {
 		
 		QShowOffJpa qShowOffJpa = QShowOffJpa.showOffJpa;
 		QShowOffReplyJpa qShowOffReplyJpa = QShowOffReplyJpa.showOffReplyJpa;
+		QShowOffLikeJpa qShowOffLikeJpa = QShowOffLikeJpa.showOffLikeJpa;
 		JPAQuery query = new JPAQuery(em);
 		
 		return  query.from(qShowOffJpa)
@@ -107,11 +133,23 @@ public class ShowOffJpaCustomRepositoryImpl  implements ShowOffJpaCustomReposito
 						.from(qShowOffReplyJpa)
 						.where(qShowOffJpa.showOffSeq.eq(qShowOffReplyJpa.showOffSeq))
 						.count().as("replyCnt")
+						,new JPASubQuery()
+						.from(qShowOffLikeJpa)
+						.where(qShowOffJpa.showOffSeq.eq(qShowOffLikeJpa.showOffSeq))
+						.count().as("likeCnt")
+						,new JPASubQuery()
+						.from(qShowOffLikeJpa)
+						.where(qShowOffLikeJpa.mbrSeq.eq(mbrSeq).and(qShowOffJpa.showOffSeq.eq(qShowOffLikeJpa.showOffSeq)))
+						.count().as("myLike")
 					)
 				);
 		
 	}
 
+	/**
+	 * 마이 스토리 리스트 페이징 조회 
+	 * TODO : 삭제 예정
+	 */
 	@Override
 	public List<ShowOffJpa> findByMbrSeq(long mbrSeq) {
 		
@@ -124,6 +162,10 @@ public class ShowOffJpaCustomRepositoryImpl  implements ShowOffJpaCustomReposito
 		
 	}
 	
+	/**
+	 * 마이 스토리 리스트 페이징 조회 
+	 * TODO : 삭제 예정
+	 */
 	@Override
 	public List<ShowOffJpa> findByMbrSeqPaging(long mbrSeq,Pageable pageable) {
 		
@@ -136,6 +178,8 @@ public class ShowOffJpaCustomRepositoryImpl  implements ShowOffJpaCustomReposito
 				.offset(pageable.getOffset())
 				.list(qShowOffJpa);
 	}
+	
+	
 	
 	@Override
 	public List<ShowOffReplyJpa> showOffReplyfindByMbrSeq(long showOffSeq) {

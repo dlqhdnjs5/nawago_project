@@ -40,6 +40,7 @@ import com.study.mk1.jpa.showOff.ShowOffJpa;
 import com.study.mk1.jpa.showOff.ShowOffJpaCustomRepository;
 import com.study.mk1.jpa.showOff.ShowOffJpaRepository;
 import com.study.mk1.jpa.showOffAttach.ShowOffAttachJpa;
+import com.study.mk1.jpa.showOffLike.ShowOffLikeJpa;
 import com.study.mk1.jpa.showOffReply.ShowOffReplyJpa;
 
 import lombok.extern.slf4j.Slf4j;
@@ -67,21 +68,37 @@ public class ShowOffController {
 	@Autowired
 	IOService ioService;
 	
+	/**
+	 * 스토리 목록 조회
+	 */
 	@GetMapping("/list")
 	@ResponseBody
 	public List<ShowOffResult> getShowOffList(HttpServletRequest req,HttpServletResponse res,Pageable pageable) throws Exception {
 		
-		List<ShowOffResult> list = showOffJpaCustomRepository.findByShowOffPagingV2(pageable);
+		long mbrSeq;
+		MbrJpa mbrJpa = new MbrJpa();
+		String token = req.getHeader("x-auth");
+		if(!"".equals(token) && !"null".equals(token) ) {
+			mbrJpa = jwtTokenProvider.getUserInfo(token);
+			mbrSeq = mbrJpa.getMbrSeq();
+		}else {
+			mbrSeq = 0; //0 인 mbrSeq 는 없음.
+		}
+		
+		List<ShowOffResult> list = showOffJpaCustomRepository.findByShowOffPagingV2(mbrSeq,pageable);
 		return list;
 	}
 	
 	
+	/**
+	 * 스토리 미디어 파일 s3 저장
+	 */
 	@PostMapping("/file/upload") 
 	@ResponseBody public ResponseEntity<Object> upload( HttpServletRequest req,HttpServletResponse res,
 			@RequestParam("data") MultipartFile multipartFile) throws IOException { 
 		
 		String  token = req.getHeader("x-auth");
-		if(!"".equals(token)) {
+		if(!"".equals(token) && !"null".equals(token) ) {
 			boolean tokenValidYn = jwtTokenProvider.validateToken(token);
 			if(!tokenValidYn)return new ResponseEntity<Object>(HttpStatus.UNAUTHORIZED);
 		}else {
@@ -97,6 +114,9 @@ public class ShowOffController {
 		return  new ResponseEntity<Object>(path,HttpStatus.OK);
 	}
 	
+	/**
+	 * 스토리 저장
+	 */
 	@PostMapping("/add")
 	@ResponseBody
 	public ResponseEntity<String> addShowOff( @RequestBody ShowOffInfoDTO dto,HttpServletRequest req,HttpServletResponse res) {
@@ -105,7 +125,7 @@ public class ShowOffController {
 		try {
 			
 			String  token = req.getHeader("x-auth");
-			if(!"".equals(token)) {
+			if(!"".equals(token) && !"null".equals(token) ) {
 				boolean tokenValidYn = jwtTokenProvider.validateToken(token);
 				if(!tokenValidYn)return new ResponseEntity<String>("401",HttpStatus.UNAUTHORIZED);
 			}else {
@@ -141,6 +161,9 @@ public class ShowOffController {
 		return  new ResponseEntity<String>(HttpStatus.OK);
 	}
 	
+	/**
+	 * 마이페이지 스토리 목록 조회
+	 */
 	@GetMapping("/getMyShowOffList")
 	@ResponseBody
 	public ResponseEntity<List<ShowOffResult>> getMyShowOffList( HttpServletRequest req,HttpServletResponse res,
@@ -174,25 +197,25 @@ public class ShowOffController {
 		
 	}
 	
+	/**
+	 * 스토리 댓글 저장
+	 */
 	@PostMapping("/addShowOffReply")
 	@ResponseBody
-	public ResponseEntity<Object> addShowOffReply(HttpServletRequest req,HttpServletResponse res, @RequestBody ShowOffInfoDTO dto) {
+	public ResponseEntity<Long> addShowOffReply(HttpServletRequest req,HttpServletResponse res, @RequestBody ShowOffInfoDTO dto) {
 		
 		String token = req.getHeader("x-auth");
 		MbrJpa mbrJpa = new MbrJpa();
-		
+		long showOffReplyCnt;
 		try {
 			
-			if(!"".equals(token)) {
+			if(!"".equals(token) && !"null".equals(token) ) {
 				boolean tokenValidYn = jwtTokenProvider.validateToken(token);
 				mbrJpa = jwtTokenProvider.getUserInfo(token);
-				if(!tokenValidYn)return new ResponseEntity<Object>(HttpStatus.UNAUTHORIZED);
+				if(!tokenValidYn)return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 			}else {
-				return new ResponseEntity<Object>(HttpStatus.UNAUTHORIZED);
+				return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 			}
-			
-			
-//			dto.getShowOffReplyjpa().(XSSUtill.stripXSS(dto.getShowOffjpa().getShowOffCont()));
 			
 			dto.getShowOffReplyJpa().setReplyCont(XSSUtill.stripXSS(dto.getShowOffReplyJpa().getReplyCont()));
 			if("".equals(dto.getShowOffReplyJpa().getReplyCont()) || StringUtils.isEmpty(dto.getShowOffReplyJpa().getReplyCont()) ) {
@@ -202,14 +225,50 @@ public class ShowOffController {
 			dto.getShowOffReplyJpa().setRegterId(mbrJpa.getMbrId());
 			
 		
-			showOffComponent.addShowOffReply(dto);
+			showOffReplyCnt = showOffComponent.addShowOffReply(dto);
 			
 		} catch (Exception e) {
-			return new ResponseEntity<Object>(HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 			// TODO Auto-generated catch block
 		}
 		
-		return new ResponseEntity<>(HttpStatus.OK);
+		return new ResponseEntity<Long>(showOffReplyCnt,HttpStatus.OK);
+	}
+	
+	
+	/**
+	 * 좋아요 버튼 update
+	 * @param req
+	 * @param res
+	 * @param dto
+	 * @return
+	 */
+	@PostMapping("/updateShowOffLike")
+	@ResponseBody
+	public ResponseEntity<Long> updateShowOffLike(HttpServletRequest req,HttpServletResponse res, @RequestBody ShowOffLikeJpa dto) {
+		
+		String token = req.getHeader("x-auth");
+		MbrJpa mbrJpa = new MbrJpa();
+		long likeCnt;
+		try {
+			
+			if(!"".equals(token) && !"null".equals(token) ) {
+				boolean tokenValidYn = jwtTokenProvider.validateToken(token);
+				mbrJpa = jwtTokenProvider.getUserInfo(token);
+				if(!tokenValidYn)return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+			}else {
+				return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+			}
+			
+			dto.setMbrSeq(mbrJpa.getMbrSeq());
+			likeCnt = showOffComponent.updateShowOffLike(dto);
+			
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			// TODO Auto-generated catch block
+		}
+		
+		return new ResponseEntity<Long>(likeCnt,HttpStatus.OK);
 	}
 	
 }

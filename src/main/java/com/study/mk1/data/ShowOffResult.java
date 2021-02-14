@@ -13,6 +13,7 @@ public class ShowOffResult {
 	
 	long replyCnt;
 	
-	
+	long likeCnt;
 
+	long myLike;
 }

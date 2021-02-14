@@ -94,19 +94,32 @@
 			    </v-card-text>
 			
 			    <v-card-actions>
-			      <v-btn
+			      <v-btn v-if="showOffObj.myLike == '1'"
 			         color="#F48FB1"
-			        icon
+			         icon
+			         :data-btn-click="setPushed(showOffObj.myLike)"
+			         @click="updateShowOffLike(showOffObj.showOffJpa.showOffSeq,showOffObj.myLike, $event)"
 			      >
-			        <v-icon>mdi-heart-outline</v-icon>	<!-- mdi-bone -->
+			        <v-icon >mdi-heart-outline</v-icon>	
+			        <span>{{showOffObj.likeCnt}}</span>
 			      </v-btn>
+			      <v-btn v-else
+			         color=""
+			         icon
+			         :data-btn-click="setPushed(showOffObj.myLike)"
+			         @click="updateShowOffLike(showOffObj.showOffJpa.showOffSeq,showOffObj.myLike, $event)"
+			      >
+			        <v-icon >mdi-heart-outline</v-icon>	
+			        <span>{{showOffObj.likeCnt}}</span>
+			      </v-btn>
+			      
 			      <v-btn
 			       color="#00BFA5"
 			        icon
 			        @click="sheet = !sheet; openReply(showOffObj.showOffJpa.showOffSeq);"
 			      >
 			       <v-icon>mdi-chat-outline</v-icon>	
-			       <span>{{showOffObj.replyCnt}}</span>
+			       <span :id="'showOffreplyCnt' + showOffObj.showOffJpa.showOffSeq">{{showOffObj.replyCnt}}</span>
 			      </v-btn>
 			      <v-spacer></v-spacer>
 			    </v-card-actions>
@@ -347,7 +360,7 @@ import 'video.js/dist/video-js.css'
 	       	.then(function(data){
 	       	})
 	       	.catch(function(err){
-	       		alert('댓글 작성을 위해\n로그인 페이지로 이동합니다.');
+	       		alert('로그인후 이용해 주시기 바랍니다.');
 	       		that.$router.push({
 	       			name:'plainLogin'
 	       		})
@@ -442,9 +455,6 @@ import 'video.js/dist/video-js.css'
    			
 		},
    		addShowOffReply : function(){
-   			
-   			//if(!this.$refs.form.validate())return false;
-   			
    			var that = this;
    			var showOffReplyJpa = {
    				'mbrSeq'	:	that.mbrInfo.mbrSeq,
@@ -454,10 +464,14 @@ import 'video.js/dist/video-js.css'
    			var param = {
    				'showOffReplyJpa' : showOffReplyJpa
    			}
+   			var $showOffreplyCntSpan = document.querySelector('#showOffreplyCnt' +that.currentShowOffSeq);
+   			
    			that.authAxios.post('/api/showOff/addShowOffReply',param)
    			.then(function(resp){
+   				var replyCntResult = resp.data;
    				that.getShowOffReplyList(that.currentShowOffSeq);
    				that.replyCont = null;
+   				$showOffreplyCntSpan.innerHTML = replyCntResult; 
    			})
    			.catch(function(err){
    				console.log(err);
@@ -502,7 +516,45 @@ import 'video.js/dist/video-js.css'
    		getShoOffCont : function(shoOffCont){
 			return shoOffCont.replaceAll('\n','</br>');
    		},
-   		slideChanged : function(event){
+   		setPushed : function(myLike){
+   			if(myLike == '1'){
+   				return 'Y';
+   			}else{
+   				return 'N';
+   			}
+   		},
+   		updateShowOffLike : function(showOffSeq,myLike,event){
+   			
+   			var $likeBtn = event.currentTarget;
+   			
+   			
+   			var $likeCnt = event.currentTarget.children[0].lastChild.innerHTML;
+			var isPushed = event.currentTarget.getAttribute('data-btn-click');
+   			
+   			if(isPushed == 'Y'){ //이미 좋아요를 누름
+   				if(parseInt($likeCnt) >= 1 ){
+   					$likeBtn.style.color='';
+   					event.currentTarget.setAttribute('data-btn-click','N');
+   				}
+   			}else{
+   				$likeBtn.style.color='#F48FB1';
+   				event.currentTarget.setAttribute('data-btn-click','Y');
+   			} 
+   			
+   			var that = this;
+   			var param = {
+   				'showOffSeq' : showOffSeq
+   			}
+   			
+   			that.authAxios.post('/api/showOff/updateShowOffLike',param)
+   			.then(function(resp){
+   				var likeCnt = resp.data;
+   				$likeBtn.children[0].lastChild.innerHTML = likeCnt; //좋아요 갯수
+   			})
+   			.catch(function(err){
+   				console.log(err);
+   			});
+   			
    		}
    		
    	}

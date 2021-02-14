@@ -22,6 +22,7 @@ import com.study.mk1.abstracts.AbstractEntity;
 import com.study.mk1.jpa.mbrAuthMapping.MbrAuthMappingJpa;
 import com.study.mk1.jpa.mbrPetMapping.MbrPetMappingJpa;
 import com.study.mk1.jpa.showOff.ShowOffJpa;
+import com.study.mk1.jpa.showOffLike.ShowOffLikeJpa;
 import com.study.mk1.jpa.showOffReply.ShowOffReplyJpa;
 
 import lombok.AllArgsConstructor;
@@ -102,5 +103,9 @@ public class  MbrJpa extends AbstractEntity{
 	@JsonIgnore
 	@OneToMany(fetch = FetchType.LAZY,mappedBy = "mbrJpa")
 	List<ShowOffReplyJpa> showOffReplyJpa = new ArrayList<ShowOffReplyJpa>();
+	
+	@JsonIgnore
+	@OneToMany(fetch = FetchType.LAZY,mappedBy = "mbrJpa")
+	List<ShowOffLikeJpa> showOffLike = new ArrayList<ShowOffLikeJpa>();
 	
 }

@@ -28,7 +28,7 @@ export function setInterceptorsCheckAuth(instance) {
 	          })
 	          .catch(function () {
 	            console.log('auth error!!');
-	            alert('세션이 만료되어 로그인 페이지로 이동합니다 \n setInterceptorsCheckAuth.');
+	            alert('로그인 후 이용해주시기 바랍니다.');
 	            router.push({
 	   				name : 'plainLogin'
 	   			})

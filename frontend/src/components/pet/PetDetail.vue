@@ -279,10 +279,6 @@ import {getImgFileExtCommon , ImgfileSizeCheckCommon} from '@/common/nawagoCommo
 		    .then( response => {
 		            var result = response.data;
 		            that.updateProfilePhoto(result);
-		            
-		           /*  that.petInfo.petImgNm = that.getRealFileName(result);
-		            that.petInfo.petImgUrl = that.getPetImgUrl(result); */
-		           
 	          })
 	          .catch(function () {
 	            console.log('FAILURE!!');

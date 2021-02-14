@@ -228,9 +228,9 @@ export default new Vuex.Store({
 			
 		},
 		PageGetter : function({commit},payload) {
-			
+			var xAxios = getAuthAxios();
 			return new Promise(function(resolve,reject){
-				axios.get(payload.url,
+				xAxios.get(payload.url,
 					{params : {
 						page : payload.page,
 						size : payload.size,

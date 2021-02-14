@@ -20,4 +20,8 @@ public class ShowOffInfoDTO extends AbstractEntity{
 	
 	private ShowOffReplyJpa showOffReplyJpa;
 	
+	private long mbrSeq;
+	
+	private long showOffSeq;
+	
 }

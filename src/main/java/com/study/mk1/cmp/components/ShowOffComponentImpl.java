@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.study.mk1.cmp.services.ShowOffService;
 import com.study.mk1.data.ShowOffInfoDTO;
+import com.study.mk1.jpa.showOffLike.ShowOffLikeJpa;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,6 +18,9 @@ public class ShowOffComponentImpl implements ShowOffComponent{
 	@Autowired
 	ShowOffService showOffService;
 	
+	/**
+	 * 스토리 저장
+	 */
 	@Override
 	public void addShowOff(ShowOffInfoDTO dto) throws Exception {
 		try {
@@ -28,16 +32,34 @@ public class ShowOffComponentImpl implements ShowOffComponent{
 		}
 	}
 	
+	/**
+	 * 스토리 댓글 저장
+	 */
 	@Override
-	public void addShowOffReply(ShowOffInfoDTO dto) throws Exception {
+	public long addShowOffReply(ShowOffInfoDTO dto) throws Exception {
 		try {
-			showOffService.addShowOffReply(dto);
+			return showOffService.addShowOffReply(dto);
 		}catch(Exception e){
 			e.printStackTrace();
 			log.error(this.getClass().getName() +".addShowOffReply() [ERROR] --> param : {}",dto);
 			throw new RuntimeException(e);
 		}
 		
+	}
+	
+	/**
+	 * 스토리 좋아요 업데이트
+	 */
+	@Override
+	public long updateShowOffLike(ShowOffLikeJpa dto) throws Exception {
+		
+		try {
+			return showOffService.updateShowOffLike(dto);
+		}catch(Exception e){
+			e.printStackTrace();
+			log.error(this.getClass().getName() +".addShowOffReply() [ERROR] --> param : {}",dto);
+			throw new RuntimeException(e);
+		}
 	}
 
 	

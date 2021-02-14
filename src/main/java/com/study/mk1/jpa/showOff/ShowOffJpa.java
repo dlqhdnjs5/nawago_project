@@ -27,6 +27,7 @@ import com.study.mk1.jpa.mbrPetMapping.MbrPetMappingId;
 import com.study.mk1.jpa.mbrPetMapping.MbrPetMappingJpa;
 import com.study.mk1.jpa.showOffAttach.ShowOffAttachId;
 import com.study.mk1.jpa.showOffAttach.ShowOffAttachJpa;
+import com.study.mk1.jpa.showOffLike.ShowOffLikeJpa;
 import com.study.mk1.jpa.showOffReply.ShowOffReplyJpa;
 
 import lombok.AllArgsConstructor;
@@ -76,6 +77,10 @@ public class ShowOffJpa extends AbstractEntity{
 	
 	@OneToMany(fetch = FetchType.EAGER,mappedBy = "showOffJpa")
 	List<ShowOffAttachJpa> showOffAttachJpa = new ArrayList<ShowOffAttachJpa>();
+	
+	@JsonIgnore
+	@OneToMany(fetch = FetchType.LAZY,mappedBy = "showOffJpa")
+	List<ShowOffLikeJpa> showOffLike = new ArrayList<ShowOffLikeJpa>();
 	
 	/*@OneToMany(fetch = FetchType.LAZY )
 	@JoinColumn(name="show_off_seq")
