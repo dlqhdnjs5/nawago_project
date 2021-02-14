@@ -18,7 +18,6 @@ export function setInterceptorsCheckAuth(instance) {
 			
 		async function(config) {
 			// Do something before request is sent
-			
 			config.headers['x-auth'] = localStorage.getItem('x-auth')
 			var param = {};
 			await axios.get('/api/validAuth',config)
@@ -32,8 +31,10 @@ export function setInterceptorsCheckAuth(instance) {
 	            router.push({
 	   				name : 'plainLogin'
 	   			})
+	            return Promise.reject('401 by interceptor')
 	          });
-			return config;	
+			 return config
+			
 		},
 		function(error) {
 			// Do something with request error

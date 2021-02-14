@@ -2,8 +2,11 @@ package com.study.mk1.common;
 
 import java.util.Collection;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,6 +16,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.security.core.context.SecurityContext;
 import com.study.mk1.controllers.DefaultController;
 import com.study.mk1.enums.ShowOffAttachEnum;
+import com.study.mk1.jpa.mbr.MbrJpa;
 import com.study.mk1.sequrity.SecurityUserDetails;
 
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +26,9 @@ import lombok.extern.slf4j.Slf4j;
 public class IOService {
 	
 	private static Logger log = LoggerFactory.getLogger(IOService.class);
+	
+	@Autowired
+	JwtTokenProvider jwtTokenProvider;
 	
 	/* 롤을 가지고 있는지 체크*/
 	@SuppressWarnings("unchecked")
@@ -129,5 +136,49 @@ public class IOService {
     	}
     	
     }
+	
+	/**
+	 * mbrInfo 를 토큰을 통해 불러오기 (보통 두번의 회원 검증을 위한 메서드)
+	 * @param req
+	 * @return
+	 * @throws Exception
+	 */
+	public MbrJpa getMbrInfoByRequest(HttpServletRequest req) throws Exception {
+		String token = jwtTokenProvider.resolveToken((HttpServletRequest) req);		
+		if(!"".equals(token) && !"null".equals(token) ) {
+			boolean tokenValidYn = jwtTokenProvider.validateToken(token);
+			if(!tokenValidYn) {
+				return null;
+			}else {
+				return jwtTokenProvider.getUserInfo(token);
+			}
+		}else {
+			return null;
+		}
+	}
+	
+	public boolean hasRoleByRequest(HttpServletRequest req) throws Exception {
+		String token = jwtTokenProvider.resolveToken((HttpServletRequest) req);		
+		boolean hasRole = false;
+		if(!"".equals(token) && !"null".equals(token) ) {
+			boolean tokenValidYn = jwtTokenProvider.validateToken(token);
+			if(!tokenValidYn) {
+				return false;
+			}else {
+				Authentication auth = jwtTokenProvider.getAuthentication(token);
+					
+				for (GrantedAuthority authority : auth.getAuthorities()) {
+					hasRole = authority.getAuthority().equals("ROLE_USER");
+					if (hasRole) {
+						return true;
+					}
+				}
+				return false;
+			}
+		}else {
+			return false;
+		}
+		
+	}
 
 }

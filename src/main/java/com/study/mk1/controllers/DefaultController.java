@@ -82,6 +82,9 @@ public class DefaultController {
 	
 	@Autowired
     private JavaMailSenderImpl mailSender;
+	
+	@Autowired
+	IOService ioService;
 
 	
 	@Autowired
@@ -100,7 +103,11 @@ public class DefaultController {
 		
 	}
 	
-	// 로그인
+	/**
+	 * 로그인
+	 * @param user
+	 * @return
+	 */
     @PostMapping("/loginProcesse")
     @ResponseBody
     public ResponseEntity<String> login(@RequestBody Map<String, String> user) {
@@ -128,38 +135,46 @@ public class DefaultController {
     }
     
     
+    /**
+     * 유저 기본 정보 조회
+     * @param req
+     * @param rs
+     * @return
+     */
     @GetMapping("/getMbrInfo")
     @ResponseBody
     public ResponseEntity<Object> getMbrInfo(HttpServletRequest req, HttpServletResponse rs) {
     	log.info("_____________________________________[getUser]_____________________________________________");
-    	String  token = req.getHeader("x-auth");
-    	/*hasRole()*/
-    	if(!"".equals(token)) {
-    		boolean tokenValidYn = jwtTokenProvider.validateToken(token);
-    		if(!tokenValidYn)return new ResponseEntity<Object>(HttpStatus.UNAUTHORIZED);
-    		MbrJpa mbr = jwtTokenProvider.getUserInfo(token);
-    		Map mbrMap = new HashMap<String,String>();
-    		mbrMap.put("mbrId", mbr.getMbrId());
-    		mbrMap.put("mbrEmail", mbr.getMbrEmail());
-    		mbrMap.put("mbrGrdCd", mbr.getMbrGrdCd());
-    		mbrMap.put("mbrMobileNo", mbr.getMbrMobAreaNo() +"-"+ mbr.getMbrMobTlofLstNo() +"-"+ mbr.getMbrMobTlofNo());
-    		mbrMap.put("mbrNm", mbr.getMbrNm());
-    		mbrMap.put("mbrNickNm", mbr.getMbrNickNm());
-    		mbrMap.put("mbrTpCd", mbr.getMbrTpCd());
-    		mbrMap.put("mbrRpstImgUrl", mbr.getMbrRpstImgUrl());
-    		mbrMap.put("mbrRpstImgNm", mbr.getMbrRpstImgNm());
-    		mbrMap.put("mbrSeq", mbr.getMbrSeq());
-    		List<MbrPetMappingJpa> list = mbr.getMbrPetMappingJpa();
-    		List<PetJpa> pet = new ArrayList<>();
-    		for(MbrPetMappingJpa obj  :  list) {
-    			pet.add(obj.getPetJpa());
-    		}
-    		mbrMap.put("mbrPet", pet);
-    		
-    		return new ResponseEntity<Object>(mbrMap,HttpStatus.OK);
-    	}else {
-    		return new ResponseEntity<Object>(HttpStatus.UNAUTHORIZED);
-    	}
+    	try {
+			if(ioService.hasRoleByRequest(req)) {
+				MbrJpa mbr =  ioService.getMbrInfoByRequest(req);
+				Map mbrMap = new HashMap<String,String>();
+				mbrMap.put("mbrId", mbr.getMbrId());
+				mbrMap.put("mbrEmail", mbr.getMbrEmail());
+				mbrMap.put("mbrGrdCd", mbr.getMbrGrdCd());
+				mbrMap.put("mbrMobileNo", mbr.getMbrMobAreaNo() +"-"+ mbr.getMbrMobTlofLstNo() +"-"+ mbr.getMbrMobTlofNo());
+				mbrMap.put("mbrNm", mbr.getMbrNm());
+				mbrMap.put("mbrNickNm", mbr.getMbrNickNm());
+				mbrMap.put("mbrTpCd", mbr.getMbrTpCd());
+				mbrMap.put("mbrRpstImgUrl", mbr.getMbrRpstImgUrl());
+				mbrMap.put("mbrRpstImgNm", mbr.getMbrRpstImgNm());
+				mbrMap.put("mbrSeq", mbr.getMbrSeq());
+				List<MbrPetMappingJpa> list = mbr.getMbrPetMappingJpa();
+				List<PetJpa> pet = new ArrayList<>();
+				for(MbrPetMappingJpa obj  :  list) {
+					pet.add(obj.getPetJpa());
+				}
+				mbrMap.put("mbrPet", pet);
+				
+				return new ResponseEntity<Object>(mbrMap,HttpStatus.OK);
+			}else {
+				return new ResponseEntity<Object>(HttpStatus.UNAUTHORIZED);
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			log.error(this.getClass()+".getMbrInfo");
+			return new ResponseEntity<Object>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
     }
 	
 	@RequestMapping(value= {"/logout"})

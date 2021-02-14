@@ -97,12 +97,11 @@ public class ShowOffController {
 	@ResponseBody public ResponseEntity<Object> upload( HttpServletRequest req,HttpServletResponse res,
 			@RequestParam("data") MultipartFile multipartFile) throws IOException { 
 		
-		String  token = req.getHeader("x-auth");
-		if(!"".equals(token) && !"null".equals(token) ) {
-			boolean tokenValidYn = jwtTokenProvider.validateToken(token);
-			if(!tokenValidYn)return new ResponseEntity<Object>(HttpStatus.UNAUTHORIZED);
-		}else {
-			return new ResponseEntity<Object>(HttpStatus.UNAUTHORIZED);
+		try {
+			if(!ioService.hasRoleByRequest(req))return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+		} catch (Exception e) {
+			log.error(this.getClass()+".upload 401");
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
 		
 		SimpleDateFormat format1 = new SimpleDateFormat ("yyyy-MM-dd");
@@ -112,6 +111,7 @@ public class ShowOffController {
 		String path = s3service.uploadWithRandomFileNm(multipartFile,"nawago/showOff/"+time1+"/");
 		
 		return  new ResponseEntity<Object>(path,HttpStatus.OK);
+		
 	}
 	
 	/**
@@ -124,15 +124,8 @@ public class ShowOffController {
 		
 		try {
 			
-			String  token = req.getHeader("x-auth");
-			if(!"".equals(token) && !"null".equals(token) ) {
-				boolean tokenValidYn = jwtTokenProvider.validateToken(token);
-				if(!tokenValidYn)return new ResponseEntity<String>("401",HttpStatus.UNAUTHORIZED);
-			}else {
-				return new ResponseEntity<String>("401",HttpStatus.UNAUTHORIZED);
-			}
-			MbrJpa mbr = jwtTokenProvider.getUserInfo(token);
-			
+			MbrJpa mbr  = ioService.getMbrInfoByRequest(req);
+			if(mbr == null)return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 			
 			//showOff setting
 			dto.getShowOffjpa().setMbrSeq(mbr.getMbrSeq());
@@ -152,7 +145,6 @@ public class ShowOffController {
 			dto.setShowOffAttachJpaList(attachList);
 			
 			showOffComponent.addShowOff(dto);
-			
 			
 		}catch(Exception e) {
 			throw new RuntimeException();
@@ -204,18 +196,12 @@ public class ShowOffController {
 	@ResponseBody
 	public ResponseEntity<Long> addShowOffReply(HttpServletRequest req,HttpServletResponse res, @RequestBody ShowOffInfoDTO dto) {
 		
-		String token = req.getHeader("x-auth");
 		MbrJpa mbrJpa = new MbrJpa();
 		long showOffReplyCnt;
 		try {
 			
-			if(!"".equals(token) && !"null".equals(token) ) {
-				boolean tokenValidYn = jwtTokenProvider.validateToken(token);
-				mbrJpa = jwtTokenProvider.getUserInfo(token);
-				if(!tokenValidYn)return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-			}else {
-				return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-			}
+			mbrJpa = ioService.getMbrInfoByRequest(req);
+			if(mbrJpa == null)return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 			
 			dto.getShowOffReplyJpa().setReplyCont(XSSUtill.stripXSS(dto.getShowOffReplyJpa().getReplyCont()));
 			if("".equals(dto.getShowOffReplyJpa().getReplyCont()) || StringUtils.isEmpty(dto.getShowOffReplyJpa().getReplyCont()) ) {
@@ -247,18 +233,12 @@ public class ShowOffController {
 	@ResponseBody
 	public ResponseEntity<Long> updateShowOffLike(HttpServletRequest req,HttpServletResponse res, @RequestBody ShowOffLikeJpa dto) {
 		
-		String token = req.getHeader("x-auth");
 		MbrJpa mbrJpa = new MbrJpa();
 		long likeCnt;
 		try {
 			
-			if(!"".equals(token) && !"null".equals(token) ) {
-				boolean tokenValidYn = jwtTokenProvider.validateToken(token);
-				mbrJpa = jwtTokenProvider.getUserInfo(token);
-				if(!tokenValidYn)return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-			}else {
-				return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-			}
+			mbrJpa = ioService.getMbrInfoByRequest(req);
+			if(mbrJpa == null)return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 			
 			dto.setMbrSeq(mbrJpa.getMbrSeq());
 			likeCnt = showOffComponent.updateShowOffLike(dto);
