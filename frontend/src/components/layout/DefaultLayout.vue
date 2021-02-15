@@ -96,7 +96,6 @@
 	      fixed 
 	      dense 
 	      app
-	      scroll-target="#scroll-area-1"
      	  hide-on-scroll
 	    >
 	      <v-btn icon  color="#00BFA5"

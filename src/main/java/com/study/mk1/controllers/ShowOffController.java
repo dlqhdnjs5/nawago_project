@@ -76,13 +76,13 @@ public class ShowOffController {
 	public List<ShowOffResult> getShowOffList(HttpServletRequest req,HttpServletResponse res,Pageable pageable) throws Exception {
 		
 		long mbrSeq;
-		MbrJpa mbrJpa = new MbrJpa();
-		String token = req.getHeader("x-auth");
-		if(!"".equals(token) && !"null".equals(token) ) {
-			mbrJpa = jwtTokenProvider.getUserInfo(token);
-			mbrSeq = mbrJpa.getMbrSeq();
-		}else {
+		MbrJpa mbr  = ioService.getMbrInfoByRequest(req);
+		
+		/*좋아요를 누른 것을 알기위해 현재 회원인지 아닌지 분기를태워 구분*/
+		if(mbr == null) {
 			mbrSeq = 0; //0 인 mbrSeq 는 없음.
+		}else {
+			mbrSeq = mbr.getMbrSeq();
 		}
 		
 		List<ShowOffResult> list = showOffJpaCustomRepository.findByShowOffPagingV2(mbrSeq,pageable);
