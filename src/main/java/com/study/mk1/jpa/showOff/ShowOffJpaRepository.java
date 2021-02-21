@@ -20,4 +20,6 @@ public interface ShowOffJpaRepository extends JpaRepository<ShowOffJpa, Long>  {
 	
 	//public void findByShowOffStatCd(String showOffStatCd);
 	
+	public void deleteByShowOffSeq(long showOffSeq);
+	
 }

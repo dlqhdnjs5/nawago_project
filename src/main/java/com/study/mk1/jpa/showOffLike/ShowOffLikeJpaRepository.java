@@ -19,4 +19,6 @@ public interface ShowOffLikeJpaRepository extends JpaRepository<ShowOffLikeJpa, 
 	 * @return
 	 */
 	long countByShowOffSeq(long showOffSeq);
+	
+	void deleteByShowOffSeq(long showOffSeq);
 }

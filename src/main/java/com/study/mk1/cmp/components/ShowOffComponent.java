@@ -19,5 +19,10 @@ public interface ShowOffComponent {
 	 * 스토리 좋아요 업데이트
 	 */
 	public long updateShowOffLike(ShowOffLikeJpa dto) throws Exception;
+	
+	/**
+	 * 스토리 삭제
+	 */
+	public void deleteShowOff(ShowOffInfoDTO dto) throws Exception;
 
 }

@@ -134,6 +134,11 @@ const routes = [
 				component : () => import('../components/detail/UserDetail.vue')
 			},
 			{
+				path: '/myPageDetail/:userId',
+				name : 'myPageDetail',
+				component : () => import('../components/detail/UserDetail.vue')
+			},
+			{
 				path: '/abandonedPet',
 				name : 'abandonedPet',
 				component : () => import('../components/abandoned/AbandonedPet.vue')

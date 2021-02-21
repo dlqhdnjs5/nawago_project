@@ -61,6 +61,21 @@ public class ShowOffComponentImpl implements ShowOffComponent{
 			throw new RuntimeException(e);
 		}
 	}
+	
+	/**
+	 * 스토리 삭제
+	 */
+	public void deleteShowOff(ShowOffInfoDTO dto) throws Exception{
+		
+		try {
+			showOffService.deleteShowOff(dto);
+		}catch(Exception e){
+			e.printStackTrace();
+			log.error(this.getClass().getName() +".updateShowOffLike() [ERROR] --> param : {}",dto);
+			throw new RuntimeException(e);
+		}
+		
+	}
 
 	
 	

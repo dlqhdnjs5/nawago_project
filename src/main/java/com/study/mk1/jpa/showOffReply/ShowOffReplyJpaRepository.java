@@ -6,4 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ShowOffReplyJpaRepository extends JpaRepository<ShowOffReplyJpa, Long> {
 	
 	long countByShowOffSeq(long showOffSeq);
+	
+	void deleteByShowOffSeq(long showOffSeq);
 }

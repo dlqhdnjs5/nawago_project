@@ -251,4 +251,28 @@ public class ShowOffController {
 		return new ResponseEntity<Long>(likeCnt,HttpStatus.OK);
 	}
 	
+	/**
+	 * 스토리 삭제
+	 * @param req
+	 * @param res
+	 * @param dto
+	 * @return
+	 */
+	@PostMapping("/deleteShowOff")
+	@ResponseBody
+	public ResponseEntity<Object> deleteShowOff(HttpServletRequest req,HttpServletResponse res, @RequestBody ShowOffInfoDTO dto) {
+		
+		MbrJpa mbrJpa = new MbrJpa();
+		try {
+			
+			showOffComponent.deleteShowOff(dto);
+			
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			// TODO Auto-generated catch block
+		}
+		
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+	
 }

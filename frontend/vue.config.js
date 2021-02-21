@@ -12,7 +12,8 @@ module.exports = {
 				"chageOrigin": true
 			}
 		},
-		overlay: false
+		overlay: false,
+		historyApiFallback: true,
 	},
 	lintOnSave: false,
  

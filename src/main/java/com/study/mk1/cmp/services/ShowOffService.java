@@ -1,5 +1,8 @@
 package com.study.mk1.cmp.services;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +13,7 @@ import com.study.mk1.jpa.showOffAttach.ShowOffAttachJpa;
 import com.study.mk1.jpa.showOffAttach.ShowOffAttachJpaRepository;
 import com.study.mk1.jpa.showOffLike.ShowOffLikeJpa;
 import com.study.mk1.jpa.showOffLike.ShowOffLikeJpaRepository;
+import com.study.mk1.jpa.showOffReply.ShowOffReplyJpa;
 import com.study.mk1.jpa.showOffReply.ShowOffReplyJpaRepository;
 
 @Service
@@ -26,6 +30,9 @@ public class ShowOffService {
 	
 	@Autowired
 	ShowOffReplyJpaRepository showOffReplyJpaRepository;
+	
+	@PersistenceContext    // EntityManagerFactory가 DI 할 수 있도록 어노테이션 설정
+    private EntityManager em;
 	
 	/**
 	 * 스토리 저장
@@ -73,6 +80,21 @@ public class ShowOffService {
 		}
 		
 		return showOffLikeJpaRepository.countByShowOffSeq(dto.getShowOffSeq());
+		
+	}
+	
+	
+	/**
+	 * 스토리 삭제
+	 * @param dto
+	 * @throws Exception
+	 */
+	public void deleteShowOff(ShowOffInfoDTO dto) throws Exception{
+		long showOffSeq = dto.getShowOffSeq();
+		showOffLikeJpaRepository.deleteByShowOffSeq(showOffSeq);
+		showOffAttachJpaRepository.deleteByShowOffSeq(showOffSeq);
+		showOffReplyJpaRepository.deleteByShowOffSeq(showOffSeq);
+		showOffJpaRepository.deleteByShowOffSeq(showOffSeq);
 		
 	}
 	

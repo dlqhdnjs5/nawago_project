@@ -24,5 +24,7 @@ public interface ShowOffJpaCustomRepository {
 
 	public List<ShowOffResult> findByShowOffPagingV2(long mbrSeq,Pageable pageable);
 	
+	public void deleteShowOff(ShowOffJpa showOffJpa);
+	
 	
 }

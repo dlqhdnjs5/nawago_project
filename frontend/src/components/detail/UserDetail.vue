@@ -290,6 +290,15 @@
 							<v-icon>mdi-chat-outline</v-icon>	
 							<span :id="'showOffreplyCnt' + myShowOffObj.showOffJpa.showOffSeq" >{{myShowOffObj.replyCnt}}</span>
 						</v-btn>
+						<div >
+							<v-btn
+							    color="grey"
+						        icon
+						        @click="menuSheet = !menuSheet; setMenuShowOffSeq(myShowOffObj.showOffJpa.showOffSeq)"
+							>
+						        <v-icon>mdi-menu</v-icon>	
+							</v-btn>
+						</div>
 					</v-card-actions>
 				</v-card>
 			</v-flex>
@@ -459,6 +468,29 @@
 	</div>
 	
 	
+	<!-- 스토리 메뉴 -->
+	<div >
+		<v-bottom-sheet v-model="menuSheet">
+			<v-list>
+				<v-subheader>스토리 메뉴</v-subheader>
+				<v-list-item 
+						v-if="isMySelf"
+						@click=""
+					>
+					<v-list-item-avatar>
+						<v-avatar color="#F48FB1">
+							<v-icon dark>
+							mdi-delete-empty
+							</v-icon>
+						</v-avatar>
+					</v-list-item-avatar>
+					<v-list-item-title>스토리 지우기(준비중)</v-list-item-title>
+				</v-list-item>
+			</v-list>
+		</v-bottom-sheet>
+	</div>
+	
+	
 	<!-- <v-speed-dial 나중에 사용할것
       v-model="fab"
       :bottom="true"
@@ -563,6 +595,7 @@ import 'video.js/dist/video-js.css'
      	          },
      	        },
       		sheet: false,
+      		menuSheet : false,
       		replySheet : false,
       		currentShowOffSeq : null,
    			replyCont : null,
@@ -571,6 +604,7 @@ import 'video.js/dist/video-js.css'
 		    //팝업버튼
 		    transition: 'slide-y-reverse-transition',
 		    fab: false,
+		    clickedShowoffSeq : null, //메뉴를 클릭한 스토리번호
     	}
     },
     compoentns : {
@@ -623,9 +657,10 @@ import 'video.js/dist/video-js.css'
 	    	}
 	    },
 	    $route : function(newVal,oldVal) {
-	    	
 	    	if(newVal.fullPath != oldVal.fullPath){
-	    		location.reload();
+	    		this.$router.go(
+	    			this.$router.currentRoute
+	    		)
 	    	}
 	    }
    	 },
@@ -952,6 +987,28 @@ import 'video.js/dist/video-js.css'
    			.catch(function(err){
    				console.log(err);
    			});
+   			
+   		},
+   		setMenuShowOffSeq : function(showoffSeq){
+   			var that = this;
+   			that.clickedShowOffSeq = showoffSeq;
+   		},
+   		deleteShowOff : function(){
+   			return;// 준비중
+   			var that = this;
+   			that.menuSheet = false;
+   			var param = {
+   	   				'showOffSeq' : that.clickedShowOffSeq
+   	   		}
+   			if(that.isMySelf){
+   				that.authAxios.post('/api/showOff/deleteShowOff',param)
+   				.then(function(resp){
+   					console.log(resp)
+   				})
+   				.catch(function(error){
+   					alert('실패')
+   				});
+   			}
    			
    		}
     }

@@ -177,26 +177,6 @@ public class DefaultController {
 		}
     }
 	
-	@RequestMapping(value= {"/logout"})
-	public String logout(HttpServletRequest request , HttpServletResponse response) throws Exception {
-		
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-		if(auth != null){
-			new SecurityContextLogoutHandler().logout(request, response, auth);
-		}
-		
-		return "redirect:/login";
-		
-	}
-	
-	@RequestMapping(value= {"/signUpPage"})
-	public String joinPage(HttpServletRequest request , HttpServletResponse response) throws Exception {
-		
-		return "display/signUpPage";
-		
-	}
-	
 	@RequestMapping(value="/join")
 	public ResponseEntity<Void> joinMbr(HttpServletRequest request , HttpServletResponse response, @RequestBody MbrInfoDTO mbrInfoDto) throws Exception {
 		

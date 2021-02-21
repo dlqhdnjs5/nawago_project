@@ -190,6 +190,12 @@ public class ShowOffJpaCustomRepositoryImpl  implements ShowOffJpaCustomReposito
 				.where(qShowOffReplyJpa.showOffSeq.eq(showOffSeq))
 				.list(qShowOffReplyJpa);
 	}
+	
+	@Override
+	public void deleteShowOff(ShowOffJpa showOffJpa) {
+		
+		
+	}
 
 
 	

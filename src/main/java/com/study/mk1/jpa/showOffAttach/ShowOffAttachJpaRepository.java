@@ -7,5 +7,7 @@ import com.study.mk1.jpa.showOff.ShowOffJpa;
 
 @Repository
 public interface ShowOffAttachJpaRepository extends JpaRepository<ShowOffAttachJpa, Long>{
+	
+	void deleteByShowOffSeq(long showOffSeq);
 
 }

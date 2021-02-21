@@ -160,7 +160,7 @@ import router from '@/router/index.js'
 		   mbrEmailRules: [
 		        value => !!value || '이메일을 입력해주세요.',
 		        value => (this.checkEmail(value)) || '옳바른 이메일 형식을 입력해 주세요.',
-		        value => (value && value.length <= 20) || '이메일은 최대 20자까지 입력 가능합니다.',
+		        value => (value && value.length <= 35) || '이메일은 최대 35자까지 입력 가능합니다.',
 		      ],
 		   nameRules: [
 			   value => (value.length  <= 15) || '이름은 최대 15자까지 입력 가능합니다.',
