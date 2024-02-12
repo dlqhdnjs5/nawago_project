@@ -14,12 +14,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import lombok.RequiredArgsConstructor;
+
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/api/common")
 public class CommonController {
-	
-	@Autowired
-	SysCdJpaRepository sysCdJpaRepository;
+	private final SysCdJpaRepository sysCdJpaRepository;
 	
 	@GetMapping("/getCommonCd")
 	@ResponseBody

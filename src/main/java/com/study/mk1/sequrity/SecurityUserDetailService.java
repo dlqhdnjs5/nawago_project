@@ -52,24 +52,7 @@ public class SecurityUserDetailService implements UserDetailsService {
 		
 		return userDetail;
 	}
-	
-	public void joinMbr(Mbr mbr ) throws Exception {
-		
-		log.debug(this.getClass().getName() + ".mbrJoin() --> param : {}",mbr);
-		PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
-		mbr.setMbrPw(passwordEncoder.encode(mbr.getMbrPw()));
-		mbr.setMbrGrdCd(MbrAuthEnum.mbrGrdCd.GNRL.toString());
-		mbr.setMbrStatCd(MbrAuthEnum.mbrStatCd.ACT.toString());
-		mbr.setMbrTpCd(MbrAuthEnum.mbrTpCd.GNRL.toString());
-		
-		MbrInfoDTO mbrInfoDTO = new MbrInfoDTO();
-		mbrInfoDTO.setMbr(mbr);
-		mbrInfoDTO.setMbrAuthMappingSeq(ROLE_USER);
-		
-		mbrComponent.joinMbr(mbrInfoDTO);
-		
-	}
-	
+
 	public void joinMbr(MbrInfoDTO mbrInfoDto ) throws Exception {
 		
 		log.debug(this.getClass().getName() + ".mbrJoin() --> param : {}",mbrInfoDto.getMbrJpa());

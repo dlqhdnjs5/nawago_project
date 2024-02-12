@@ -1,12 +1,6 @@
 package com.study.mk1.controllers;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,40 +12,24 @@ import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.security.core.GrantedAuthority;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.study.mk1.cmp.repositorys.MbrRepository;
 import com.study.mk1.common.IOService;
 import com.study.mk1.common.JwtTokenProvider;
 import com.study.mk1.common.S3service;
 import com.study.mk1.config.GlobalPropertySource;
 import com.study.mk1.data.MbrInfoDTO;
-import com.study.mk1.entity.Mbr;
 import com.study.mk1.enums.MbrEnum;
-import com.study.mk1.interceptors.CustomHandlerImpl;
 import com.study.mk1.jpa.mbr.MbrJpa;
 import com.study.mk1.jpa.mbr.MbrJpaRepository;
 import com.study.mk1.jpa.mbrPetMapping.MbrPetMappingJpa;
@@ -60,49 +38,21 @@ import com.study.mk1.sequrity.SecurityUserDetailService;
 import com.study.mk1.sequrity.SecurityUserDetails;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping("/api")
 public class DefaultController {
-	
-	private static Logger log = LoggerFactory.getLogger(DefaultController.class);
-	
-	@Autowired
-	MbrRepository mbrRepository;
-	
-	@Autowired
-	MbrJpaRepository mbrJpaRepository;
-	
-	@Autowired
-	S3service s3service;
-	
-	@Autowired
-	GlobalPropertySource gp;
-	
-	@Autowired
-    private JavaMailSenderImpl mailSender;
-	
-	@Autowired
-	IOService ioService;
-
-	
-	@Autowired
-	SecurityUserDetailService securityUserDetailService;
-	
+	private final MbrJpaRepository mbrJpaRepository;
+	private final GlobalPropertySource gp;
+	private final JavaMailSenderImpl mailSender;
+	private final IOService ioService;
+	private final SecurityUserDetailService securityUserDetailService;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtTokenProvider jwtTokenProvider;
-	
-	
-	@RequestMapping(value= {"/home","/"})
-	public String home(HttpServletRequest rquest , HttpServletResponse response)  {
-		
-		log.info("home");
-		//TODO : 로그인 만든후 회원가입 만들기
-		return "index";
-		
-	}
-	
+
 	/**
 	 * 로그인
 	 * @param user
@@ -111,7 +61,6 @@ public class DefaultController {
     @PostMapping("/loginProcesse")
     @ResponseBody
     public ResponseEntity<String> login(@RequestBody Map<String, String> user) {
-    	log.info("_____________________________________[LOGIN]_____________________________________________");
     	MbrJpa mbrJpa = mbrJpaRepository.findByMbrId(user.get("email"));
     	
     	if(mbrJpa == null) {
@@ -133,7 +82,6 @@ public class DefaultController {
         	return new ResponseEntity<String>(jwtTokenProvider.createToken(userDetail.getUsername(), userDetail.getAuthorities()), HttpStatus.OK);
     	}
     }
-    
     
     /**
      * 유저 기본 정보 조회

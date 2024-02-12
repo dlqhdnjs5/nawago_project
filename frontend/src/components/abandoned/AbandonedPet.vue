@@ -138,7 +138,6 @@ import store from '@/store/store'
          
 		},
 		getFirstAbandonedPetListPage: function(){ //처음 인입시 리스트 로드
-   			
   			var that = this;
   	   		
   			this.$store.dispatch('PageGetter',{
@@ -179,28 +178,26 @@ import store from '@/store/store'
    			
 		},
    		timeForToday : function(value) {
-   			
-   			var that = this;
-   			var today = this.$moment.tz('Asia/Seoul');
-	        var timeValue = this.$moment(value).tz('Asia/Seoul'); 
-	        var betweenTime = Math.floor((today - timeValue) / 1000 / 60);
-	       
-	        if (betweenTime < 1) return '방금전';
-	        if (betweenTime < 60) {
-	            return parseInt(betweenTime) + '분전';
-	        }
-	        
-	        var betweenTimeHour = Math.floor(betweenTime / 60);
-	        if (betweenTimeHour < 24) {
-	            return parseInt(betweenTimeHour) + '시간전';
-	        }
-	        
-	        var betweenTimeDay = Math.floor(betweenTime / 60 / 24);
-	        if (betweenTimeDay < 365) {
-	            return parseInt(betweenTimeDay) + '일전';
-	        }
-	        
-	        return Math.floor(betweenTimeDay / 365) + '년전';
+        var today = this.$moment.tz('Asia/Seoul');
+        var timeValue = this.$moment(value).tz('Asia/Seoul');
+        var betweenTime = Math.floor((today - timeValue) / 1000 / 60);
+
+        if (betweenTime < 1) return '방금전';
+        if (betweenTime < 60) {
+          return parseInt(betweenTime) + '분전';
+        }
+
+        var betweenTimeHour = Math.floor(betweenTime / 60);
+        if (betweenTimeHour < 24) {
+          return parseInt(betweenTimeHour) + '시간전';
+        }
+
+        var betweenTimeDay = Math.floor(betweenTime / 60 / 24);
+        if (betweenTimeDay < 365) {
+          return parseInt(betweenTimeDay) + '일전';
+        }
+
+        return Math.floor(betweenTimeDay / 365) + '년전';
 
    		},
    		getShoOffCont : function(shoOffCont){

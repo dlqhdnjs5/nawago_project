@@ -7,7 +7,6 @@ import {getAuthAxios} from '@/interceptor/axiosInterceptor'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
-
 	state : {
 		xToken :  localStorage.getItem('x-auth'),
 		testState : '',
@@ -135,17 +134,14 @@ export default new Vuex.Store({
 			commit('logout');
 			router.push('/plain/login');
 		}, 
-		getMbrInfoLogin : ({commit}) => {//로그인후  데이터 main.js 에서 데이터 가져오기위함
-			
-			var token = localStorage.getItem('x-auth');
+		getMbrInfoLogin : ({commit}) => {
+			const token = localStorage.getItem('x-auth');
 			if(!!token){
-				var newAxios = getAuthAxios();
+				const newAxios = getAuthAxios();
 				newAxios.get('/api/getMbrInfo')
 				.then(resp =>{
-					
-					var mbrInfoResult = resp.data;
-					
-					var mbrInfoDto = {
+					const mbrInfoResult = resp.data;
+					const mbrInfoDto = {
 						mbrEmail 		: mbrInfoResult.mbrEmail,
 						mbrGrdCd 		: mbrInfoResult.mbrGrdCd,
 						mbrId 			: mbrInfoResult.mbrId,
@@ -153,7 +149,6 @@ export default new Vuex.Store({
 						mbrNm 			: mbrInfoResult.mbrNm,
 						mbrTpCd 		: mbrInfoResult.mbrTpCd
 					}
-					
 					commit('setMbrInfo',mbrInfoDto)
 					commit('loginSuccess');
 				})
@@ -167,10 +162,10 @@ export default new Vuex.Store({
 		},
 		getMbrInfo : function({commit}) {
 			return new Promise(function(resolve, reject) {
-				var token = localStorage.getItem('x-auth');
-				var mbrInfoResult = {};
+				const token = localStorage.getItem('x-auth');
+				let mbrInfoResult = {};
 				if(!!token){
-					var newAxios = getAuthAxios();
+					const newAxios = getAuthAxios();
 					newAxios.get('/api/getMbrInfo')
 					.then(resp =>{
 						
@@ -190,28 +185,14 @@ export default new Vuex.Store({
 			})
 		},
 		getValidAuth : function(commit) {
-			
 			return new Promise(function(resolve,reject){
-				var xAxios = getAuthAxios();
+				const xAxios = getAuthAxios();
 				xAxios.get('/api/validAuth')
 				.then(function(resp){
 					resolve(resp);
 				  })
 				  .catch(function(err){
 					  reject(err);
-				  });
-			})
-		},
-		getValidAuth2: function(commit) {
-			
-			return new Promise(function(resolve,reject){
-				var xAxios = getAuthAxios();
-				xAxios.get('/api/validAuth2')
-				.then(function(resp){
-					resolve(resp.data);
-				  })
-				  .catch(function(err){
-					  reject(err.data);
 				  });
 			})
 		},
@@ -225,10 +206,9 @@ export default new Vuex.Store({
 					  reject(err);
 				  })
 			});
-			
 		},
 		PageGetter : function({commit},payload) {
-			var xAxios = getAuthAxios();
+			const xAxios = getAuthAxios();
 			return new Promise(function(resolve,reject){
 				xAxios.get(payload.url,
 					{params : {

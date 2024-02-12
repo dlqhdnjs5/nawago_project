@@ -8,11 +8,12 @@ import org.springframework.stereotype.Service;
 import com.study.mk1.jpa.coronaInfo.CoronaInfoJpa;
 import com.study.mk1.jpa.coronaInfo.CoronaInfoJpaRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class CoronaCommanService {
-	
-	@Autowired
-	CoronaInfoJpaRepository coronaInfoJpaRepository;
+	private final CoronaInfoJpaRepository coronaInfoJpaRepository;
 
 	/**
 	 * 코로나 정보 등록

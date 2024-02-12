@@ -23,11 +23,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class AuthenticationController {
-	
-	@Autowired
-	SecurityUserDetailService securityUserDetailService;
-	
-	private final PasswordEncoder passwordEncoder;
 	private final JwtTokenProvider jwtTokenProvider;
 	
 	@GetMapping(value = "/authenticated")
