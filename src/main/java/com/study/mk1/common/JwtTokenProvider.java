@@ -30,55 +30,42 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Component
 public class JwtTokenProvider {
-	
-	//TODO : 설정파일로 뺄것
-	private  String SECRETKEY;
-	private  long EXPIRATION_MS = 1000 * 60 * 60 ; 
-	
+	private String SECRETKEY;
+	private long EXPIRATION_MS = 1000 * 60 * 60 ;
+
 	private final UserDetailsService userDetailsService;
+	private final SecurityUserDetailService securityUserDetailService;
+	private final MbrJpaRepository mbrJpaRepository;
+	private final GlobalPropertySource gp;
 	
-	@Autowired
-	private SecurityUserDetailService securityUserDetailService;
-	
-	@Autowired
-	private MbrJpaRepository mbrJpaRepository;
-	
-	@Autowired
-	GlobalPropertySource gp;
-	
-	 // 객체 초기화, secretKey를 Base64로 인코딩한다.
 	@PostConstruct
 	protected void init() {	
 		SECRETKEY = Base64.getEncoder().encodeToString(gp.getSecretKey().getBytes());
 	}
 
-	 // JWT 토큰 생성
 	public String createToken(String userPk, Collection<? extends GrantedAuthority> roles) {
-		Claims claims = Jwts.claims().setSubject(userPk); // JWT payload 에 저장되는 정보단위
-		claims.put("roles", roles); // 정보는 key / value 쌍으로 저장된다.
+		Claims claims = Jwts.claims().setSubject(userPk);
+		claims.put("roles", roles);
 		Date now = new Date();
 		
 		return Jwts.builder()
-		.setClaims(claims) // 정보 저장
-		.setIssuedAt(now) // 토큰 발행 시간 정보
+		.setClaims(claims)
+		.setIssuedAt(now)
 		.setExpiration(new Date(now.getTime() + EXPIRATION_MS)) 
 		.signWith(SignatureAlgorithm.HS256, SECRETKEY) 
 		.compact();
 	}
 	
-	// JWT 토큰에서 인증 정보 조회
 	public Authentication getAuthentication(String token) {
 		UserDetails userDetails = securityUserDetailService.loadUserByUsername(this.getUserPk(token));
 		return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
 	}
 	
-	// JWT 토큰에서 인증 정보 조회
 	public Authentication getAuthenticationById(String id) {
 		UserDetails userDetails = securityUserDetailService.loadUserByUsername(id);
 		return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
 	}
 
-	 // 토큰에서 회원 정보 추출
 	public String getUserPk(String token) {
 		return Jwts.parser().setSigningKey(SECRETKEY).parseClaimsJws(token).getBody().getSubject();
 	}
@@ -97,7 +84,6 @@ public class JwtTokenProvider {
 		return request.getHeader(gp.getAuthHeader());
 	}
 
-    // 토큰의 유효성 + 만료일자 확인
 	public boolean validateToken(String jwtToken) {
 		try {
 			Jws<Claims> claims = Jwts.parser().setSigningKey(SECRETKEY).parseClaimsJws(jwtToken);

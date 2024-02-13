@@ -17,61 +17,10 @@ import java.util.regex.Pattern;
 @Slf4j
 public class XSSUtill {
 
-		/**
-		 * <p>
-		 * description about class
-		 * </p>
-		 * Sanitize.
-		 * 
-		 * @param string the string
-		 * @return the string
-		 */
-		public static String sanitize(String string) {
-
-			if (string == null) {
-				return "";
-			}
-			String value = "";
-			try{
-				value = string.replaceAll("(?i)<script.*?>.*?</script.*?>", "")
-						.replaceAll("(?i)<.*?javascript:.*?>.*?</.*?>", "")
-						.replaceAll("(?i)<.*?\\s+on.*?>.*?</.*?>", "");
-				value = escapeHTML(value);
-			}catch(Exception e){
-				log.error("",e);
-			}
-			return StringUtils.trimWhitespace(string);
-		}
-		
-		/**
-		 * <p>
-		 * description about class
-		 * </p>
-		 * Escape html.
-		 * 
-		 * @param value the value
-		 * @return the string
-		 */
 		public static String escapeHTML (String value) {
 			String str = value;
 			str = StringUtils.replace(str, "<", "&lt;");
 			str = StringUtils.replace(str, ">", "&gt;");
-			return str;
-		}
-		
-		/**
-		 * <p>
-		 * description about class
-		 * </p>
-		 * Unescape html.
-		 * 
-		 * @param value the value
-		 * @return the string
-		 */
-		public static String unescapeHTML (String value) {
-			String str = value;
-			str = org.springframework.util.StringUtils.replace(str, "&lt;", "<");
-			str = StringUtils.replace(str, "&gt;", ">" );
 			return str;
 		}
 		
@@ -116,8 +65,9 @@ public class XSSUtill {
 					value = scriptPattern.matcher(value).replaceAll("");
 					
 					value = escapeHTML(value);
-				}catch(Exception e){
-					log.error("",e);
+				} catch(Exception exception){
+					log.error("XSS founded. value {} ", value,  exception);
+					throw new RuntimeException(exception);
 				}
 			}
 			return value;

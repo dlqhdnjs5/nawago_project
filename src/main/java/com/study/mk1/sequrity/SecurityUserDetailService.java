@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.study.NawagoMk2Application;
 import com.study.mk1.cmp.components.MbrComponent;
@@ -24,38 +25,30 @@ import com.study.mk1.entity.Auth;
 import com.study.mk1.entity.Mbr;
 import com.study.mk1.jpa.mbr.MbrJpa;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Component
+@RequiredArgsConstructor
 public class SecurityUserDetailService implements UserDetailsService {
-	
 	private static long ROLE_USER = 1;
 	private static long ROLE_ADMIN = 4;
 	
-	private static Logger log = LoggerFactory.getLogger(SecurityUserDetailService.class);
-	
-	@Autowired
-	private AuthService authService;
-	
-	@Autowired
-	private MbrComponent mbrComponent;
+	private final AuthService authService;
+	private final  MbrComponent mbrComponent;
 	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		// TODO Auto-generated method stub
-		
 		UserDetails userDetail = authService.getSecurityUserDetails(username);
-		
-		if(userDetail.getUsername() == null) {
+		if(StringUtils.isEmpty(userDetail.getUsername())) {
 			throw new UsernameNotFoundException("username " + username + " not found");
 		}
-		
-		log.info("***************User exist***************");
-		
+
 		return userDetail;
 	}
 
 	public void joinMbr(MbrInfoDTO mbrInfoDto ) throws Exception {
-		
-		log.debug(this.getClass().getName() + ".mbrJoin() --> param : {}",mbrInfoDto.getMbrJpa());
 		PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 		mbrInfoDto.getMbrJpa().setMbrPw(passwordEncoder.encode(mbrInfoDto.getMbrJpa().getMbrPw()));
 		mbrInfoDto.getMbrJpa().setMbrGrdCd(MbrAuthEnum.mbrGrdCd.GNRL.toString());
@@ -64,7 +57,6 @@ public class SecurityUserDetailService implements UserDetailsService {
 		mbrInfoDto.setMbrAuthMappingSeq(ROLE_USER);
 		
 		mbrComponent.joinMbr(mbrInfoDto);
-		
 	}
 
 

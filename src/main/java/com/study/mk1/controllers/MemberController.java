@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,72 +40,59 @@ import com.study.mk1.jpa.mbr.MbrJpaRepository;
 import com.study.mk1.jpa.mbrPetMapping.MbrPetMappingJpa;
 import com.study.mk1.jpa.pet.PetJpa;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/api/member")
 public class MemberController {
-	
-	@Autowired
-	S3service s3service;
-	
-	@Autowired
-	IOService ioService;
-	
-	@Autowired
-	JwtTokenProvider jwtTokenProvider;
-	
-	@Autowired
-	MbrJpaCustomRepository mbrJpaCustomRepository;
-	
-	@Autowired
-	MbrJpaRepository mbrJpaRepository;
-	
-	@Autowired
-	MbrComponent mbrComponent;
+	private final S3service s3service;
+	private final IOService ioService;
+	private final JwtTokenProvider jwtTokenProvider;
+	private final MbrJpaCustomRepository mbrJpaCustomRepository;
+	private final MbrComponent mbrComponent;
 	
 	@GetMapping(value="/checkMbrId")
 	@ResponseBody
-	public boolean checkMbrId(HttpServletRequest request,@RequestParam(value="mbrId") String mbrId) {
-		
+	public boolean checkMbrId(@RequestParam(value="mbrId") String mbrId) {
 		return mbrComponent.checkMbrId(mbrId);
 	}
 	
 	@PostMapping(value="/isExistMbrInfo")
 	@ResponseBody
-	public String isExistMbrInfo(HttpServletRequest request, @RequestBody MbrInfoDTO mbrInfoDto) throws Exception {
-		
+	public String isExistMbrInfo(@RequestBody MbrInfoDTO mbrInfoDto) throws Exception {
 		return mbrComponent.isExistMbrInfo(mbrInfoDto);
 	}
 	
 	@PostMapping(value="/isExistMbrInfoForUpdate")
 	@ResponseBody
-	public String isExistMbrInfoForUpdate(HttpServletRequest request, @RequestBody MbrInfoDTO mbrInfoDto) throws Exception {
-		
+	public String isExistMbrInfoForUpdate(@RequestBody MbrInfoDTO mbrInfoDto) throws Exception {
 		return mbrComponent.isExistMbrInfoForUpdate(mbrInfoDto);
 	}
 	
 	@PostMapping("/file/upload") 
-	@ResponseBody public ResponseEntity<Object> upload( HttpServletRequest req,HttpServletResponse res,
-			@RequestParam("data") MultipartFile multipartFile) throws IOException { 
-		
-		String  token = req.getHeader("x-auth");
-		if(!"".equals(token)) {
-			boolean tokenValidYn = jwtTokenProvider.validateToken(token);
-			if(!tokenValidYn)return new ResponseEntity<Object>(HttpStatus.UNAUTHORIZED);
-		}else {
+	@ResponseBody public ResponseEntity<Object> upload(HttpServletRequest req,	@RequestParam("data") MultipartFile multipartFile) throws IOException {
+		String token = req.getHeader("x-auth");
+		if (StringUtils.isEmpty(token)) {
 			return new ResponseEntity<Object>(HttpStatus.UNAUTHORIZED);
 		}
+
+		boolean tokenValidYn = jwtTokenProvider.validateToken(token);
+		if (!tokenValidYn) return new ResponseEntity<Object>(HttpStatus.UNAUTHORIZED);
 		
 		if(!ioService.checkImgFileExts(multipartFile.getOriginalFilename())) {
 			return new ResponseEntity<Object>(HttpStatus.BAD_REQUEST);
 		}
-		
+
 		String path = s3service.uploadWithRandomFileNm(multipartFile,"nawago/myPage/profile/");
-		
-		return  new ResponseEntity<Object>(path,HttpStatus.OK);
+
+		return new ResponseEntity<Object>(path,HttpStatus.OK);
 	}
 	
 	@PostMapping("/file/delete") 
-	@ResponseBody public void delete(HttpServletRequest req,HttpServletResponse res,  @RequestBody PetInfoDTO dto) throws IOException { 
+	@ResponseBody public void delete(@RequestBody PetInfoDTO dto) throws IOException {
 		
 		try {
 			String filePath = "nawago/myPage/profile/"+dto.getFileName().toString();
@@ -118,8 +106,7 @@ public class MemberController {
 	}
 	
 	@PostMapping("/update/profilePhoto")
-	public ResponseEntity<Object> updateProfilePhoto(HttpServletRequest req,HttpServletResponse res,@RequestBody MbrInfoDTO mbrInfoDTO) throws Exception {
-			
+	public ResponseEntity<Object> updateProfilePhoto(@RequestBody MbrInfoDTO mbrInfoDTO) throws Exception {
 		try {
 			MbrJpa mbrJpa = new MbrJpa();
 			mbrJpa.setMbrSeq(mbrInfoDTO.getMbrSeq());
@@ -132,35 +119,31 @@ public class MemberController {
 			map.put("mbrRpstImgNm", mbrJpa.getMbrRpstImgNm());
 			return new ResponseEntity<>( map,  HttpStatus.OK);
 			
-		}catch(Exception e) {
+		} catch (Exception e) {
+			log.error("error occurred while update profilePhoto mbrInfoDto: {}", mbrInfoDTO, e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
 	}
 	
 	@PostMapping("/update")
-	public ResponseEntity<Object> updateMember(HttpServletRequest req,HttpServletResponse res,@RequestBody MbrInfoDTO mbrInfoDTO) throws Exception {
-			
+	public ResponseEntity<Object> updateMember(@RequestBody MbrInfoDTO mbrInfoDTO) throws Exception {
 		try {
 			mbrInfoDTO.setMbrEmail(XSSUtill.stripXSS(mbrInfoDTO.getMbrEmail()));
 			mbrInfoDTO.setMbrNickNm(XSSUtill.stripXSS(mbrInfoDTO.getMbrNickNm()));
 			mbrInfoDTO.setMbrNm(XSSUtill.stripXSS(mbrInfoDTO.getMbrNm()));
 			mbrComponent.updateMbr(mbrInfoDTO);
 			return new ResponseEntity<>( HttpStatus.OK);
-			
-		}catch(Exception e) {
+		} catch(Exception e) {
+			log.error("error occurred while update  MbrInfoDTO: {}", mbrInfoDTO, e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
 	}
 	
 	@GetMapping("/getUserInfo")
-	public ResponseEntity<MbrInfoResult> getUserInfo(HttpServletRequest req,HttpServletResponse res,@RequestParam(value="userId") String userId) throws Exception {
-		
+	public ResponseEntity<MbrInfoResult> getUserInfo(@RequestParam(value="userId") String userId) throws Exception {
 		try {
-			
-			
-			
 			MbrJpa mbrJpa = mbrJpaCustomRepository.findByMbrId(userId);
 			if(mbrJpa == null) {
 				return new ResponseEntity<>(null, HttpStatus.OK);

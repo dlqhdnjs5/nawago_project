@@ -24,12 +24,7 @@ public class CommonController {
 	
 	@GetMapping("/getCommonCd")
 	@ResponseBody
-	public List<SysCdJpa> getCommonCd(HttpServletRequest req, HttpServletResponse res,
-			@RequestParam(value="upperCd") String upperCd) throws Exception{
-		
-		List<SysCdJpa> cdList = sysCdJpaRepository.findByUpperCd(upperCd);
-		
-		return cdList;
+	public List<SysCdJpa> getCommonCd(@RequestParam(value="upperCd") String upperCd) throws Exception{
+		return sysCdJpaRepository.findByUpperCd(upperCd);
 	}
-
 }

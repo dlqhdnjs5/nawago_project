@@ -38,49 +38,32 @@ import com.study.mk1.jpa.showOffAttach.ShowOffAttachJpa;
 import com.study.mk1.jpa.showOffLike.ShowOffLikeJpa;
 import com.study.mk1.jpa.showOffReply.ShowOffReplyJpa;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @Slf4j
 @RequestMapping("/api/showOff")
+@RequiredArgsConstructor
 public class ShowOffController {
+	private final S3service s3service;
+	private final ShowOffComponent showOffComponent;
+	private final ShowOffJpaCustomRepository showOffJpaCustomRepository;
+	private final IOService ioService;
 
-	@Autowired
-	S3service s3service;
-	
-	@Autowired
-	JwtTokenProvider jwtTokenProvider;
-	
-	@Autowired
-	ShowOffComponent showOffComponent;
-	
-	@Autowired
-	ShowOffJpaRepository showOffJpaRepository;
-	
-	@Autowired
-	ShowOffJpaCustomRepository showOffJpaCustomRepository;
-	
-	@Autowired
-	IOService ioService;
-	
-	/**
-	 * 스토리 목록 조회
-	 */
 	@GetMapping("/list")
 	@ResponseBody
-	public List<ShowOffResult> getShowOffList(HttpServletRequest req,HttpServletResponse res,Pageable pageable) throws Exception {
-		long mbrSeq;
+	public List<ShowOffResult> getShowOffList(HttpServletRequest req, Pageable pageable) {
 		MbrJpa mbr  = ioService.getMbrInfoByRequest(req);
-		
-		/*좋아요를 누른 것을 알기위해 현재 회원인지 아닌지 분기를태워 구분*/
+
+		long mbrSeq;
 		if(mbr == null) {
-			mbrSeq = 0; //0 인 mbrSeq 는 없음.
+			mbrSeq = 0;
 		}else {
 			mbrSeq = mbr.getMbrSeq();
 		}
 		
-		List<ShowOffResult> list = showOffJpaCustomRepository.findByShowOffPagingV2(mbrSeq,pageable);
-		return list;
+		return showOffJpaCustomRepository.findByShowOffPagingV2(mbrSeq,pageable);
 	}
 	
 	

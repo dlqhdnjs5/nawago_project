@@ -5,6 +5,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 
+import lombok.Getter;
+
 @Configuration
 @PropertySources({
 	@PropertySource(value = "file:/etc/tomcat9/properties/config.properties",encoding="utf-8",ignoreResourceNotFound = true),
@@ -12,7 +14,7 @@ import org.springframework.context.annotation.PropertySources;
 })
 //1순위 서버
 //2순위 클래스패스
-
+@Getter
 public class GlobalPropertySource {
 	
 	/*Database resources*/
@@ -46,16 +48,10 @@ public class GlobalPropertySource {
 	
 	@Value("${auth.header}")
     private String authHeader;
-    
-    /*base*/
+
     @Value("${base.ip}")
     private String baseIp;
-    
-    
-    
-    /**
-     * email 
-     */
+
     @Value("${spring.mail.host}")
     private String mailHost;
     
@@ -67,90 +63,16 @@ public class GlobalPropertySource {
     
     @Value("${spring.mail.password}")
     private String mailPw;
-    
-    /**
-     * abandoned
-     * @return
-     */
-    
+
     @Value("${abandoned.api.key}")
     private String abandonedApiKey;
-    
-    public String getAbandonedApiKey() {
-		return abandonedApiKey;
-	}
-
-	public String getAbandonedApiServerUrl() {
-		return abandonedApiServerUrl;
-	}
 
 	@Value("${abandoned.api.server.url}")
-    private String abandonedApiServerUrl;
-    
-    
-    public String getMailHost() {
-		return mailHost;
-	}
+	private String abandonedApiServerUrl;
 
-	public String getMailPort() {
-		return mailPort;
-	}
-
-	public String getMailId() {
-		return mailId;
-	}
-
-	public String getMailPw() {
-		return mailPw;
-	}
-
-	public String getAccessKey() {
-		return accessKey;
-	}
-
-	public String getSecretKey() {
-		return secretKey;
-	}
-
-	public String getBucket() {
-		return bucket;
-	}
-
-	public String getRegion() {
-		return region;
-	}
-
-	public String getDriverClassName() {
-        return driverClassName;
-    }
- 
-    public String getUrl() {
-        return url;
-    }
- 
-    public String getUsername() {
-        return username;
-    }
- 
-    public String getPassword() {
-        return password;
-    }
-
-    public String getBaseIp() {
-    	return baseIp;
-    }
-    
     public String getBaseUri() {
     	return "http://"+baseIp;
     }
-    
-    public String getSecretWebTokenKey() {
-  		return secretWebTokenKey;
-  	}
-    
-    public String getAuthHeader() {
-		return authHeader;
-	}
 
 
 }

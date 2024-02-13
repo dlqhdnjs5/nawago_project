@@ -9,22 +9,10 @@ import com.study.mk1.data.ShowOffResult;
 import com.study.mk1.jpa.showOffReply.ShowOffReplyJpa;
 
 public interface ShowOffJpaCustomRepository {
-
-	public List<ShowOffJpa> findByShowOffStatCd();
-	
-	public List<ShowOffJpa> findByShowOffPaging(Pageable pageable);
-	
-	public List<ShowOffJpa> findByMbrSeq(long mbrSeq);
-	
-	public List<ShowOffJpa> findByMbrSeqPaging(long mbrSeq,Pageable pageable);
-	
-	public List<ShowOffResult> findByMbrSeqPagingV2(long mbrSeq,Pageable pageable);
-	
-	public List<ShowOffReplyJpa> showOffReplyfindByMbrSeq(long showOffSeq);
-
-	public List<ShowOffResult> findByShowOffPagingV2(long mbrSeq,Pageable pageable);
-	
-	public void deleteShowOff(ShowOffJpa showOffJpa);
+	List<ShowOffResult> findByMbrSeqPagingV2(long mbrSeq,Pageable pageable);
+	List<ShowOffReplyJpa> showOffReplyfindByMbrSeq(long showOffSeq);
+	List<ShowOffResult> findByShowOffPagingV2(long mbrSeq,Pageable pageable);
+	void deleteShowOff(ShowOffJpa showOffJpa);
 	
 	
 }

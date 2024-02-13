@@ -28,16 +28,17 @@ import com.study.mk1.jpa.showOffReply.ShowOffReplyJpa;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "mbr")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class  MbrJpa extends AbstractEntity{
-	
+public class  MbrJpa extends AbstractEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "mbr_seq", updatable = false, insertable = false)

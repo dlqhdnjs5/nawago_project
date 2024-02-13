@@ -14,6 +14,7 @@ import com.study.mk1.config.GlobalPropertySource;
 
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,15 +25,13 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 
+@Slf4j
 @Service
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class S3service {
-	
+	private final GlobalPropertySource globalPropertySource;
 	private AmazonS3 s3Client;
 
-	@Autowired
-	GlobalPropertySource globalPropertySource;
-	
     @PostConstruct
     public void setS3Client() {
         AWSCredentials credentials = new BasicAWSCredentials(globalPropertySource.getAccessKey(), globalPropertySource.getSecretKey());
@@ -43,16 +42,15 @@ public class S3service {
                 .build();
     }
 
-    //s3 업로드  ex)uploadPath  == 'nawago/pet/petInfo/'
     public String upload(MultipartFile file,String uploadPath) throws IOException {
         String fileName = uploadPath+file.getOriginalFilename();
+
         s3Client.putObject(new PutObjectRequest(globalPropertySource.getBucket(), fileName, file.getInputStream(), null)
                 .withCannedAcl(CannedAccessControlList.PublicRead));
         return s3Client.getUrl(globalPropertySource.getBucket(), fileName).toString();
     }
     
     public String uploadWithRandomFileNm(MultipartFile file,String uploadPath) throws IOException {
-       
     	String ext = this.getFileExt(file);
         String randomStr = this.getRandomStr(16);
         String fileName = uploadPath+randomStr+ext;
@@ -61,24 +59,17 @@ public class S3service {
         return s3Client.getUrl(globalPropertySource.getBucket(), fileName).toString();
     }
     
-    //s3 삭제  ex)uploadPath  == 'nawago/pet/petInfo/sss.jpg'
     public void delete(String fileName) {
         try {
-            //Delete 객체 생성
             DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(globalPropertySource.getBucket(), fileName);
-            //Delete
             this.s3Client.deleteObject(deleteObjectRequest);
-            System.out.println(String.format("[%s] deletion complete", fileName));
-
-        } catch (AmazonServiceException e) {
-            e.printStackTrace();
-        } catch (SdkClientException e) {
-            e.printStackTrace();
+        } catch (RuntimeException runtimeException) {
+        	log.error("error occurred while delete file, fileName: {}", fileName, runtimeException);
+            throw runtimeException;
         }
     }
     
     private  String getRandomStr(int size) {
-    	
 		char[] tmp = new char[size];
 		for(int i=0; i<tmp.length; i++) {
 			int div = (int) Math.floor( Math.random() * 2 );

@@ -30,42 +30,18 @@ public class PetComponentImpl implements PetComponent{
 			try {
 				petService.registPet(petInfoDTO);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				log.info(e.toString());
 				throw new RuntimeException(e);
 			}
 		}
 		
-		/**
-		 * 프로필 사진 변경
-		 * @param mbrJpa
-		 * @throws Exception
-		 */
-		public void updatePetProfilePhoto(PetJpa pet) throws Exception{
-			
-			try {
-				petService.updatePetProfilePhoto(pet);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				log.info(e.toString());
-				throw new RuntimeException(e);
-			}
-			
+		public void updatePetProfilePhoto(PetJpa pet) {
+			petService.updatePetProfilePhoto(pet);
 		}
 		
 		@Override
-		public void updatePet(PetInfoDTO petInfoDTO) throws Exception {
-			
-			try {
-				
-				petService.updatePet(petInfoDTO);
-				
-			}catch(Exception e) {
-				log.info(e.getMessage());
-				log.info(this.getClass()+".updatePet [ERROR] ! param -> {}",petInfoDTO);
-				throw new RuntimeException(e);
-			}
-			
+		public void updatePet(PetInfoDTO petInfoDTO) {
+			petService.updatePet(petInfoDTO);
 		}
 		
 }

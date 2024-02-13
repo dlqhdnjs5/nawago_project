@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -46,7 +47,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api")
 public class DefaultController {
 	private final MbrJpaRepository mbrJpaRepository;
-	private final GlobalPropertySource gp;
 	private final JavaMailSenderImpl mailSender;
 	private final IOService ioService;
 	private final SecurityUserDetailService securityUserDetailService;
@@ -63,24 +63,25 @@ public class DefaultController {
     public ResponseEntity<String> login(@RequestBody Map<String, String> user) {
     	MbrJpa mbrJpa = mbrJpaRepository.findByMbrId(user.get("email"));
     	
-    	if(mbrJpa == null) {
+    	if (ObjectUtils.isEmpty(mbrJpa)) {
     		return new ResponseEntity<String>("회원정보가 존재하지 않습니다.",HttpStatus.UNAUTHORIZED);
-    	}else {
-    		SecurityUserDetails userDetail = new SecurityUserDetails(mbrJpa, mbrJpa.getMam().getAuthJpa());
-        	if(userDetail == null) {
-        		return new ResponseEntity<String>("회원정보가 존재하지 않습니다.",HttpStatus.UNAUTHORIZED);
-        	}
-        	if (!passwordEncoder.matches(user.get("password"), userDetail.getPassword())) {
-        		return new ResponseEntity<String>("올바른 비밀번호를 입력해 주세요.",HttpStatus.UNAUTHORIZED);
-        	}
-        	if(mbrJpa.getMbrStatCd().equals(MbrEnum.StatCd.SCSI.toString())) {
-        		return new ResponseEntity<String>("비활성화된 계정 입니다.",HttpStatus.UNAUTHORIZED);
-        	}
-        	if(mbrJpa.getMbrStatCd().equals(MbrEnum.StatCd.FSCSI.toString())) {
-        		return new ResponseEntity<String>("부적절한 행위로 강제탈퇴 되었습니다.",HttpStatus.UNAUTHORIZED);
-        	}
-        	return new ResponseEntity<String>(jwtTokenProvider.createToken(userDetail.getUsername(), userDetail.getAuthorities()), HttpStatus.OK);
     	}
+
+		SecurityUserDetails userDetail = new SecurityUserDetails(mbrJpa, mbrJpa.getMam().getAuthJpa());
+		if (!passwordEncoder.matches(user.get("password"), userDetail.getPassword())) {
+			return new ResponseEntity<String>("올바른 비밀번호를 입력해 주세요.",HttpStatus.UNAUTHORIZED);
+		}
+
+		if(mbrJpa.getMbrStatCd().equals(MbrEnum.StatCd.SCSI.toString())) {
+			return new ResponseEntity<String>("비활성화된 계정 입니다.",HttpStatus.UNAUTHORIZED);
+		}
+
+		if(mbrJpa.getMbrStatCd().equals(MbrEnum.StatCd.FSCSI.toString())) {
+			return new ResponseEntity<String>("부적절한 행위로 강제탈퇴 되었습니다.",HttpStatus.UNAUTHORIZED);
+		}
+
+		return new ResponseEntity<String>(jwtTokenProvider.createToken(userDetail.getUsername(), userDetail.getAuthorities()), HttpStatus.OK);
+
     }
     
     /**
@@ -92,7 +93,6 @@ public class DefaultController {
     @GetMapping("/getMbrInfo")
     @ResponseBody
     public ResponseEntity<Object> getMbrInfo(HttpServletRequest req, HttpServletResponse rs) {
-    	log.info("_____________________________________[getUser]_____________________________________________");
     	try {
 			if(ioService.hasRoleByRequest(req)) {
 				MbrJpa mbr =  ioService.getMbrInfoByRequest(req);
@@ -109,13 +109,13 @@ public class DefaultController {
 				mbrMap.put("mbrSeq", mbr.getMbrSeq());
 				List<MbrPetMappingJpa> list = mbr.getMbrPetMappingJpa();
 				List<PetJpa> pet = new ArrayList<>();
-				for(MbrPetMappingJpa obj  :  list) {
+				for (MbrPetMappingJpa obj  :  list) {
 					pet.add(obj.getPetJpa());
 				}
 				mbrMap.put("mbrPet", pet);
 				
 				return new ResponseEntity<Object>(mbrMap,HttpStatus.OK);
-			}else {
+			} else {
 				return new ResponseEntity<Object>(HttpStatus.UNAUTHORIZED);
 			}
 		} catch (Exception e) {
@@ -126,23 +126,16 @@ public class DefaultController {
     }
 	
 	@RequestMapping(value="/join")
-	public ResponseEntity<Void> joinMbr(HttpServletRequest request , HttpServletResponse response, @RequestBody MbrInfoDTO mbrInfoDto) throws Exception {
-		
+	public ResponseEntity<Void> joinMbr(@RequestBody MbrInfoDTO mbrInfoDto) throws Exception {
 		try {
-			
-			if(mbrInfoDto != null && mbrInfoDto.getMbrJpa() != null) {
-				mbrInfoDto.getMbrJpa().setMbrPw(mbrInfoDto.getMbrPw());//@JsonIgnore 으로인한 dto 로 대체
+			if(!ObjectUtils.isEmpty(mbrInfoDto) && !ObjectUtils.isEmpty(mbrInfoDto.getMbrJpa())) {
+				mbrInfoDto.getMbrJpa().setMbrPw(mbrInfoDto.getMbrPw());
 				securityUserDetailService.joinMbr(mbrInfoDto);
-				
 			}else {
-				NullPointerException e = new NullPointerException();
-				throw e;
+				throw new NullPointerException();
 			}
-			
-		}catch(NullPointerException e) {
-			log.warn("NullPointerException :  {}",mbrInfoDto);
-		}catch(Exception e) {
-			throw new Exception();
+		} catch(Exception e) {
+			throw new Exception("Error occured while join member ", e);
 		}
 		
 		return ResponseEntity.status(HttpStatus.OK).build();
@@ -150,14 +143,10 @@ public class DefaultController {
 	
 	@PostMapping("/sendAuthEmail")
 	@ResponseBody 
-	public ResponseEntity<String> sendAuthEmail(HttpServletRequest request , HttpServletResponse response , @RequestBody MbrInfoDTO mbrInfoDto)throws Exception {
-		
-		
-		log.info(this.getClass()+".sendAuthEmail [INFO] dto -> {}",mbrInfoDto);
+	public ResponseEntity<String> sendAuthEmail(@RequestBody MbrInfoDTO mbrInfoDto)throws Exception {
 		String key=  "";
 		try {
-			key= this.getRandomStr(8);  //인증번호 
-			String nawagoEmail = gp.getMailId();
+			key= this.getRandomStr(8);
 			MimeMessage mail = mailSender.createMimeMessage();
 			
 			String sendMsg = new StringBuilder().append("<h2>Nawago<h2><br>")
@@ -190,14 +179,13 @@ public class DefaultController {
 	
 	
 	private  String getRandomStr(int size) {
-    	
 		char[] tmp = new char[size];
 		for(int i=0; i<tmp.length; i++) {
 			int div = (int) Math.floor( Math.random() * 2 );
 			
-			if(div == 0) { // 0이면 숫자로
+			if(div == 0) {
 				tmp[i] = (char) (Math.random() * 10 + '0') ;
-			}else { //1이면 알파벳
+			}else {
 				tmp[i] = (char) (Math.random() * 26 + 'A') ;
 			}
 		}

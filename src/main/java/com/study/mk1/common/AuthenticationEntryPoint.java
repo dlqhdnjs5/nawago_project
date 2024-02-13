@@ -14,19 +14,15 @@ import org.springframework.stereotype.Component;
 
 import com.study.mk1.controllers.DefaultController;
 
+import lombok.extern.slf4j.Slf4j;
 
-
+@Slf4j
 @Component
 public class AuthenticationEntryPoint implements org.springframework.security.web.AuthenticationEntryPoint{
 
-	private static Logger log = LoggerFactory.getLogger(AuthenticationEntryPoint.class);
-	
 	public void commence(HttpServletRequest req , HttpServletResponse res , AuthenticationException e) throws IOException,ServletException {
-		
-		
-		log.info("Authentication [ERROR]");
+		log.error("Authentication Denied ", e);
 		res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Access Denied");
-		
 	}
 
 }

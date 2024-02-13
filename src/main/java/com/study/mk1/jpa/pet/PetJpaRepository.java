@@ -8,14 +8,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface  PetJpaRepository extends JpaRepository<PetJpa, Long>{
-	
-	/**
-	 * pet 정보 조회
-	 * @param petSeq
-	 * @return
-	 */
-	public PetJpa findByPetSeq(long petSeq);
-	
+	PetJpa findByPetSeq(long petSeq);
 	
 	@Modifying
 	@Query("UPDATE PetJpa m "
@@ -23,7 +16,7 @@ public interface  PetJpaRepository extends JpaRepository<PetJpa, Long>{
 			+ "m.petImgNm = :petImgNm "
 			+ "WHERE 1=1"
 			+ "AND m.petSeq = :petSeq")
-	public int updatePetProfilePhoto(String petImgUrl , String petImgNm, long petSeq);
+	void updatePetProfilePhoto(String petImgUrl , String petImgNm, long petSeq);
 	
 	
 	@Modifying
@@ -32,6 +25,6 @@ public interface  PetJpaRepository extends JpaRepository<PetJpa, Long>{
 			+ "m.petIntro = :petIntro "
 			+ "WHERE 1=1"
 			+ "AND m.petSeq = :petSeq")
-	public void updateMbr(long petSeq , String petNm, String petIntro);
+	void updateMbr(long petSeq , String petNm, String petIntro);
 
 }

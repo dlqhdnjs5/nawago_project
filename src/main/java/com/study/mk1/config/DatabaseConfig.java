@@ -13,11 +13,12 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
-@Configuration
-public class DatabaseConfig {
+import lombok.RequiredArgsConstructor;
 
-	@Autowired
-	GlobalPropertySource globalPropertySource;
+@Configuration
+@RequiredArgsConstructor
+public class DatabaseConfig {
+	private final GlobalPropertySource globalPropertySource;
 
 	@Bean
 	@Primary
@@ -31,16 +32,8 @@ public class DatabaseConfig {
             .build();
 	}
 
-
-	/**
-	 * mybatis 세션팩토리 설정
-	 * @param dataSource
-	 * @return
-	 * @throws Exception
-	 */
 	@Bean
 	public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception {
-		
 		SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
 		sessionFactory.setDataSource(dataSource);
 		
@@ -56,6 +49,4 @@ public class DatabaseConfig {
 		final SqlSessionTemplate sqlSessionTemplate = new SqlSessionTemplate(sqlSessionFactory);
 		return sqlSessionTemplate;
 	}
-
-	
 }

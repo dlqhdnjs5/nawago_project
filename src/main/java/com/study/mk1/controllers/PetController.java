@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,95 +36,63 @@ import com.study.mk1.jpa.mbr.MbrJpa;
 import com.study.mk1.jpa.pet.PetJpa;
 import com.study.mk1.jpa.pet.PetJpaRepository;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @Slf4j
 @RequestMapping("/api/pet")
+@RequiredArgsConstructor
 public class PetController {
-
-	@Autowired
-	S3service s3service;
-	
-	@Autowired
-	JwtTokenProvider jwtTokenProvider;
-	
-	@Autowired
-	PetComponent petComponent;
-	
-	@Autowired
-	PetJpaRepository petJpaRepository;
-	
-	@Autowired
-	IOService ioService;
+	private final S3service s3service;
+	private final JwtTokenProvider jwtTokenProvider;
+	private final PetComponent petComponent;
+	private final PetJpaRepository petJpaRepository;
+	private final IOService ioService;
 	
 	
 	@PostMapping("/file/upload") 
 	@ResponseBody public String upload(@RequestParam("data") MultipartFile multipartFile) throws IOException { 
-		
-		String path = s3service.uploadWithRandomFileNm(multipartFile,"nawago/pet/petInfo/");
-		
-		return path;
+		return s3service.uploadWithRandomFileNm(multipartFile,"nawago/pet/petInfo/");
 	}
 	
 	
 	@PostMapping("/file/delete") 
-	@ResponseBody public void delete(HttpServletRequest req,HttpServletResponse res,  @RequestBody PetInfoDTO dto) throws IOException { 
-		
+	@ResponseBody public void delete(@RequestBody PetInfoDTO dto) throws IOException {
 		try {
 			String filePath = "nawago/pet/petInfo/"+dto.getFileName().toString();
 			s3service.delete(filePath);
-		} catch (AmazonServiceException e) {
-            e.printStackTrace();
-        } catch (SdkClientException e) {
-            e.printStackTrace();
+		} catch (Exception exception) {
+			log.error("error occurred while delete file. PetInfoDTO: {}", dto, exception);
+            throw exception;
         }
-		
+
 	}
-	
-	@PostMapping("/tesUpload") 
-	@ResponseBody
-	public String tesUpload( HttpServletRequest req,HttpServletResponse res,  @RequestBody PetInfoDTO dto) throws IOException { 
-		
-		try {
-			String filePath = "nawago/pet/petInfo/"+dto.getFileName().toString();
-			s3service.delete(filePath);
-		} catch (AmazonServiceException e) {
-            e.printStackTrace();
-        } catch (SdkClientException e) {
-            e.printStackTrace();
-        }
-		
-		return dto.toString();
-	}
-	
+
 	@PostMapping("/registPet") 
 	@ResponseBody
-	public ResponseEntity<Object> registPet( HttpServletRequest req,HttpServletResponse res,  @RequestBody PetInfoDTO dto) throws IOException,Exception { 
-		
-		String  token = req.getHeader("x-auth");
-		if(!"".equals(token)) {
-    		boolean tokenValidYn = jwtTokenProvider.validateToken(token);
-    		if(!tokenValidYn)return new ResponseEntity<Object>(HttpStatus.UNAUTHORIZED);
-    		MbrJpa mbr = jwtTokenProvider.getUserInfo(token);
-    		dto.setMbrJpa(mbr);
-    		dto.getPetJpa().setPetIntro(XSSUtill.stripXSS(dto.getPetJpa().getPetIntro()));
-    		dto.getPetJpa().setPetNm(XSSUtill.stripXSS(dto.getPetJpa().getPetNm()));
-    		petComponent.registPet(dto);
-    		
-    		return new ResponseEntity<Object>(HttpStatus.OK);
-    	}else {
-    		return new ResponseEntity<Object>(HttpStatus.UNAUTHORIZED);
+	public ResponseEntity<Object> registPet( HttpServletRequest req, @RequestBody PetInfoDTO dto) throws Exception {
+		String token = req.getHeader("x-auth");
+		if(StringUtils.isEmpty(token)) {
+			return new ResponseEntity<Object>(HttpStatus.UNAUTHORIZED);
     	}
-		
+
+		boolean tokenValidYn = jwtTokenProvider.validateToken(token);
+		if(!tokenValidYn) return new ResponseEntity<Object>(HttpStatus.UNAUTHORIZED);
+
+		MbrJpa mbr = jwtTokenProvider.getUserInfo(token);
+		dto.setMbrJpa(mbr);
+		dto.getPetJpa().setPetIntro(XSSUtill.stripXSS(dto.getPetJpa().getPetIntro()));
+		dto.getPetJpa().setPetNm(XSSUtill.stripXSS(dto.getPetJpa().getPetNm()));
+		petComponent.registPet(dto);
+
+		return new ResponseEntity<Object>(HttpStatus.OK);
 	}
 	
 	@GetMapping("/getPetInfo")
 	@ResponseBody
-	public ResponseEntity<PetJpa> getPetInfo( HttpServletRequest req,HttpServletResponse res,  @RequestParam(value="petSeq") long petSeq) throws Exception {
-		
+	public ResponseEntity<PetJpa> getPetInfo(@RequestParam(value="petSeq") long petSeq) {
 		try {
-			
 			PetJpa petJpa = petJpaRepository.findByPetSeq(petSeq);
 			
 			if(petJpa == null) {
@@ -131,17 +100,14 @@ public class PetController {
 			}
 			
 			return new ResponseEntity<PetJpa>(petJpa,HttpStatus.OK);
-			
-		}catch(Exception e) {
-			log.error(e.toString());
+		} catch(RuntimeException runtimeException) {
+			log.error("error occurred while getPetInfo. petSeq : {}", petSeq, runtimeException);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		
 	}
 	
 	@PostMapping("/update/petProfilePhoto")
-	public ResponseEntity<Object> updateProfilePhoto(HttpServletRequest req,HttpServletResponse res,@RequestBody PetInfoDTO petInfoDTO) throws Exception {
-			
+	public ResponseEntity<Object> updateProfilePhoto(@RequestBody PetInfoDTO petInfoDTO) {
 		try {
 			PetJpa petJpa = new PetJpa();
 			petJpa.setPetSeq(petInfoDTO.getPetSeq());
@@ -154,25 +120,24 @@ public class PetController {
 			map.put("mbrRpstImgNm", petJpa.getPetImgNm());
 			return new ResponseEntity<>( map,  HttpStatus.OK);
 			
-		}catch(Exception e) {
+		} catch (RuntimeException runtimeException) {
+			log.error("error occurred while updatePet. PetInfoDTO : {}", petInfoDTO, runtimeException);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		
 	}
 	
 	@PostMapping("/update")
-	public ResponseEntity<Object> updatePet(HttpServletRequest req,HttpServletResponse res,@RequestBody PetInfoDTO petInfoDTO) throws Exception {
-			
+	public ResponseEntity<Object> updatePet(@RequestBody PetInfoDTO petInfoDTO) {
 		try {
 			petInfoDTO.setPetIntro(XSSUtill.stripXSS(petInfoDTO.getPetIntro()));
 			petInfoDTO.setPetNm(XSSUtill.stripXSS(petInfoDTO.getPetNm()));
 			petComponent.updatePet(petInfoDTO);
 			return new ResponseEntity<>( HttpStatus.OK);
 			
-		}catch(Exception e) {
+		} catch (RuntimeException runtimeException) {
+			log.error("error occurred while updatePet. PetInfoDTO : {}", petInfoDTO, runtimeException);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		
 	}
 		
 }

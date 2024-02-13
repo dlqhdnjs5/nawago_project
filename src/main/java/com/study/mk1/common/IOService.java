@@ -12,6 +12,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.security.core.context.SecurityContext;
 import com.study.mk1.controllers.DefaultController;
@@ -19,105 +20,61 @@ import com.study.mk1.enums.ShowOffAttachEnum;
 import com.study.mk1.jpa.mbr.MbrJpa;
 import com.study.mk1.sequrity.SecurityUserDetails;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class IOService {
-	
-	private static Logger log = LoggerFactory.getLogger(IOService.class);
-	
-	@Autowired
-	JwtTokenProvider jwtTokenProvider;
-	
-	/* 롤을 가지고 있는지 체크*/
-	@SuppressWarnings("unchecked")
+	private final JwtTokenProvider jwtTokenProvider;
+	private static final String ROLE_USER = "ROLE_USER";
+
 	public static boolean hasRole() {
 		boolean hasRole = false;
-		try {
-			if (SecurityContextHolder.getContext() != null && SecurityContextHolder.getContext().getAuthentication() != null
-					&& SecurityContextHolder.getContext().getAuthentication().getAuthorities() != null) {
-				Collection<GrantedAuthority> authorities = (Collection<GrantedAuthority>) SecurityContextHolder.getContext()
-						.getAuthentication().getAuthorities();
+		if (SecurityContextHolder.getContext() != null && SecurityContextHolder.getContext().getAuthentication() != null
+				&& SecurityContextHolder.getContext().getAuthentication().getAuthorities() != null) {
+			Collection<GrantedAuthority> authorities = (Collection<GrantedAuthority>) SecurityContextHolder.getContext()
+					.getAuthentication().getAuthorities();
 
-				for (GrantedAuthority authority : authorities) {
-					hasRole = authority.getAuthority().equals("ROLE_USER");
-					if (hasRole) {
-						break;
-					}
+			for (GrantedAuthority authority : authorities) {
+				hasRole = authority.getAuthority().equals(ROLE_USER);
+				if (hasRole) {
+					break;
 				}
 			}
-		} catch (Exception e) {
-			log.info("=======================================");
-			log.info("hasRole() error occour :: " + e.getMessage());
-			log.info("=======================================");
 		}
+
 		return hasRole;
 	}
-	
-	/* 스프링 시큐리티로 로그인된 사용자 세션정보를 얻는다. */
-	public static Object getCurrentUserDetailPrincipal() {
-		SecurityContext context = SecurityContextHolder.getContext();
-		if (context == null || context.getAuthentication() == null) {
-			return null;
-		} else {
-			return context.getAuthentication().getPrincipal();
-		}
-	}
-	
-	/* 스프링 시큐리티로 로그인된 사용자 세션정보를 얻는다. */
-	public static SecurityUserDetails getCurrentUserDetail() {
-		SecurityContext context = SecurityContextHolder.getContext();
-		if (context == null || context.getAuthentication() == null) {
-			return null;
-		} else {
-			return  (SecurityUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		}
-	}
-	
+
 	public boolean checkImgFileExts(String fileUrl) {
-		
 		String extension = StringUtils.getFilenameExtension(fileUrl);
     	extension = extension.toLowerCase();
     	
     	String imgExts = "jpg,png,jpeg,pdf";
-    	if(imgExts.contains(extension)) {
-    		return true;
-    	}else {
-    		return false;
-    	}
+		return imgExts.contains(extension);
 		
 	}
 	
 	public String getFileNm(String fileUrl) {
 		String fileName = "";
-		try {
-			if(!"".equals(fileUrl) ) {
-				int slshIndex = fileUrl.lastIndexOf( "/" );
-				fileName = fileUrl.substring( slshIndex + 1 );
-			}else {
-				return null;
-			}
-			
-		}catch(Exception e) {
-			log.info(this.getClass() + ".getFileNm [ERROR]");
+
+		if(StringUtils.isEmpty(fileUrl)) {
+			return null;
 		}
-		return fileName;
+
+		int slshIndex = fileUrl.lastIndexOf( "/" );
+		return fileUrl.substring( slshIndex + 1 );
 	}
 	
 	public String getFileUrl(String fileUrl) {
-		String url  = "";
-		try {
-			if(!"".equals(fileUrl) ) {
-				int slshIndex = fileUrl.lastIndexOf( "/" );
-				url = fileUrl.substring(0, slshIndex  );
-			}else {
-				return null;
-			}
-		}catch(Exception e){
-			log.info(this.getClass() + ".getFileUrl [ERROR]");
+		if(StringUtils.isEmpty(fileUrl)) {
+			return null;
 		}
-		return url;
+
+		int slshIndex = fileUrl.lastIndexOf( "/" );
+		return fileUrl.substring(0, slshIndex  );
 	}
 	
 	public String getFileTpCd(String fileUrl) {
@@ -129,32 +86,27 @@ public class IOService {
     	
     	if(movExts.contains(extension)) {
     		return ShowOffAttachEnum.TpCd.MOV.toString();
-    	}else if(imgExts.contains(extension)) {
-    		return ShowOffAttachEnum.TpCd.IMG.toString();
-    	}else {
-    		return null;
     	}
-    	
+
+    	if (imgExts.contains(extension)) {
+    		return ShowOffAttachEnum.TpCd.IMG.toString();
+    	}
+
+    	return null;
     }
 	
-	/**
-	 * mbrInfo 를 토큰을 통해 불러오기 (보통 두번의 회원 검증을 위한 메서드)
-	 * @param req
-	 * @return
-	 * @throws Exception
-	 */
-	public MbrJpa getMbrInfoByRequest(HttpServletRequest req) throws Exception {
-		String token = jwtTokenProvider.resolveToken((HttpServletRequest) req);		
-		if(!"".equals(token) && !"null".equals(token) ) {
-			boolean tokenValidYn = jwtTokenProvider.validateToken(token);
-			if(!tokenValidYn) {
-				return null;
-			}else {
-				return jwtTokenProvider.getUserInfo(token);
-			}
-		}else {
+	public MbrJpa getMbrInfoByRequest(HttpServletRequest req) {
+		String token = jwtTokenProvider.resolveToken(req);
+		if(StringUtils.isEmpty(token)) {
 			return null;
 		}
+
+		boolean tokenValidYn = jwtTokenProvider.validateToken(token);
+		if (!tokenValidYn) {
+			return null;
+		}
+
+		return jwtTokenProvider.getUserInfo(token);
 	}
 	
 	public boolean hasRoleByRequest(HttpServletRequest req) throws Exception {
