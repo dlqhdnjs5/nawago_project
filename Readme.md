@@ -17,10 +17,80 @@
 
 ### 개발 환경
 
-호스팅 : AWS( IAM, EC2, RDS, S3, ROUTE 53) 
-Frontend : Vuejs(SPA), Vuex, Vuetify, HTML, CSS
-Backend : SpringBoot, JAVA, JPA, QueryDSL, MyBatis,
-Security : JWT, SpringSecurity
-Database : mariaDB
-배포환경 : LINUX(Ubuntu) ,node.js, tomcat, GIT, maven,
-도메인 : 가비아 서비스 활용
+* 호스팅 : AWS( IAM, EC2, RDS, S3, ROUTE 53) 
+
+* Frontend : Vuejs(SPA), Vuex, Vuetify, HTML, CSS
+* Backend : SpringBoot, JAVA, JPA, QueryDSL, MyBatis,
+* Security : JWT, SpringSecurity
+* Database : mariaDB
+* 배포환경 : LINUX(Ubuntu) ,node.js, tomcat, GIT, maven,
+* 도메인 : 가비아 서비스 활용
+
+## 서버 구성
+![image](https://github.com/dlqhdnjs5/nawago_project/assets/73633754/8887528b-e5f2-49cf-a606-3679d18c07d4)
+
+## 화면 구성
+![image](https://github.com/dlqhdnjs5/nawago_project/assets/73633754/115bbe1b-b00e-4fec-a5a0-60cc002dcfa4)
+![image](https://github.com/dlqhdnjs5/nawago_project/assets/73633754/8a8285d3-e18c-4ac3-a2cf-4633be062dc1)
+![image](https://github.com/dlqhdnjs5/nawago_project/assets/73633754/630066c8-3c66-49db-bafa-cda02d381305)
+![image](https://github.com/dlqhdnjs5/nawago_project/assets/73633754/179ffdb5-51c7-4793-8093-c64a64fc2c8a)
+![image](https://github.com/dlqhdnjs5/nawago_project/assets/73633754/6921bb4c-bf1f-4bc1-8b90-dc4350194347)
+![image](https://github.com/dlqhdnjs5/nawago_project/assets/73633754/75ba03b2-7e80-4dbb-8f80-115117b83234)
+
+## 느낀점
+
+프로젝트를 진행하며 어려웠던점 추가로 진행 해야 할점
+1. 리펙토링
+-시간 부족으로 인한 부족한 코드를 리펙토링을 통해 좀더 간결하
+고 효과적으로 수정.
+2. 주석 처리
+-앞으로도 유지보수를 해야 할 소스로서 혼자 알기엔 많은 양인 이유
+로 정리가 잘된 주석으로 관리
+3. 추가 사항
+- BO 화면을 통한 사이트 운영 관리 개발
+- 젠킨스를 이용한 배포 자동화
+- AWS 과금을 줄일수 있는 형태로 연구, 전환
+- SNS 로그인 추가.
+- 좋아요 기능추가.
+- 개인 활동 알림 기능 추가.
+- 그 외에 새로운 기술을 적용하며 학습.
+
+### 깨달은 점
+평소 출퇴근 시간에서의 공부 시간이 모여 커다란 성과로 이루어 질 수
+있음을 깨달았으며, 책과 영상을 보며 공부하는 것도 좋다고 생각하지만
+제일 좋은 점 은 직접 구현해보고 테스트 해보는 것이며, 그보다 더 좋은
+점 은 현장에서 직접 경험해 보는 것을 느꼈습니다.
+처음 해보는 경험을 통해 많은 것을 배울 수 있는 프로젝트 이고, 현 프로
+젝트는 계속 유지보수 해 나갈 것으로 새로운 기술, 다른 기술을 접목해 학
+습용으로 쓰일 것입니다.
+프로젝트를 진행하며 어려웠던점
+
+1. 회사를 다니며 진행하려니 일정 예상보다 딜레이.
+- 회사를 다니면서 진행하기엔 시간이 부족했어서 처음정한 일정에 마추
+기엔 힘이 들었습니다. 이에 저는 일정과 계획을 더 세분화하여 개발을
+진행하였고, 모자란 시간은 지하철 출퇴근시간을 활용 하였습니다. 결과
+적으로 더욱 자세한 일정의 현상황을 알수있었고, 일정에관한 문제에
+대해 빠른시간 내에 대처할수 있었습니다.
+
+2. 처음 써보는 기술에 대해 익숙해 지는 단계.
+- 언제나 그렇듯 처음은 쉽지 않지만. 새로운 것에 대한 욕심이 많은 저
+에게 만족스러운 과정 이었습니다. 모르겠는 문제점에 대해 회피하거나
+우회 하는것이 아닌 해결해 나가기 위해 적극적으로 커뮤니티에 질문
+을 올리거나, 레퍼런스 문서를 보며 문제를 해결했습니다. “ 아무것도 하
+지 않으면 아무 일도 일어나지 않는다” 라는 말을 다시 되새기게 되는
+과정 이였습니다.
+
+3. 개발을 협업이 아닌 혼자 진행.
+- 자유롭게 개발하는 것은 즐거웠으나, 의견, 회의 등 협업을 통해
+얻을 수 있는 시너지 효과를 무시 못했습니다. 하지만 모든 개발 및
+구성을 혼자 함으로써 전체적인 과정 , 구축 , 소스 에 대한 것을 모
+두 경험할 수 있었습니다.
+
+4. 로그 의 중요성
+- 제한된 인원으로 테스트를 하다보니 누락된 테스트도 존재하였습니다.
+그래서 사이트를 오픈하고 나서 지인들에게 홍보를 한뒤 테스트를 유
+도하고 피드백을 받았습니다. 예상치 못한 결함들의 존재를 알수있었지
+만 문제의 위치가 광범위 했었습니다. 그래서 저는 반드시 필요한 위치
+에 더욱 치밀하게 심어 두었습니다. 그 결과로 실시간 로그 모니터링을
+통해 정확한 위치를 파악하고, 신속하게 문제점을 해결할수 있었으며 로
+그의 중요성을 다시 느낄수 있었습니다.
