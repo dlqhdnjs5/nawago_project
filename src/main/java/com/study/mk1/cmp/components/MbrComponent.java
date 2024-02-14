@@ -8,12 +8,9 @@ public interface MbrComponent {
 	
 	boolean checkMbrId(String mbrId);
 	
-	String isExistMbrInfo(MbrInfoDTO mbrInfoDto) throws Exception;
-	
-	String isExistMbrInfoForUpdate(MbrInfoDTO mbrInfoDto) throws Exception;
+	String isExistMbrInfoForUpdate(MbrInfoDTO mbrInfoDto);
 	
 	void updateProfilePhoto(MbrJpa mbrJpa) throws Exception;
 	
 	void updateMbr(MbrInfoDTO mbrInfoDTO) throws Exception;
-	
 }

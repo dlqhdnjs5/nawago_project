@@ -9,7 +9,6 @@ Vue.use(Vuex)
 export default new Vuex.Store({
 	state : {
 		xToken :  localStorage.getItem('x-auth'),
-		testState : '',
 		isLogin : null,
 		isLoginError : true,
 		mbrInfo : {
@@ -26,9 +25,6 @@ export default new Vuex.Store({
 		}
 	},
 	getters : {
-		getTestState : state => {
-			return state.testState;
-		},
 		getMbrInfo : function(state){
 			return state.mbrInfo;
 		},
@@ -105,9 +101,6 @@ export default new Vuex.Store({
 		}
 	},
 	actions : {
-		setTestStateMut : ({commit},payload) => {
-			commit('setTestState',payload);
-		},
 		setLoginSuccess : ({commit}) => {
 			commit('loginSuccess');
 		},

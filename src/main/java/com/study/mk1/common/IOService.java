@@ -58,8 +58,6 @@ public class IOService {
 	}
 	
 	public String getFileNm(String fileUrl) {
-		String fileName = "";
-
 		if(StringUtils.isEmpty(fileUrl)) {
 			return null;
 		}
@@ -112,7 +110,7 @@ public class IOService {
 	public boolean hasRoleByRequest(HttpServletRequest req) throws Exception {
 		String token = jwtTokenProvider.resolveToken((HttpServletRequest) req);		
 		boolean hasRole = false;
-		if(!"".equals(token) && !"null".equals(token) ) {
+		if(!StringUtils.isEmpty(token)) {
 			boolean tokenValidYn = jwtTokenProvider.validateToken(token);
 			if(!tokenValidYn) {
 				return false;
@@ -130,7 +128,5 @@ public class IOService {
 		}else {
 			return false;
 		}
-		
 	}
-
 }

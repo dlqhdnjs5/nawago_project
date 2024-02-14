@@ -22,7 +22,7 @@ public class SecurityAuthenticationFailureHandler extends SimpleUrlAuthenticatio
 	public void onAuthenticationFailure(HttpServletRequest request,
 			HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
 		
-		ObjectMapper mapper = new ObjectMapper();	//JSON 변경용
+		ObjectMapper mapper = new ObjectMapper();
 
 		SecurityResult securityResult = new SecurityResult();
 		securityResult.setCode(HttpStatus.UNAUTHORIZED);
@@ -35,9 +35,5 @@ public class SecurityAuthenticationFailureHandler extends SimpleUrlAuthenticatio
         response.setStatus(HttpServletResponse.SC_OK);
         response.getWriter().print(mapper.writeValueAsString(securityResult));
         response.getWriter().flush();
-        
-//      PrintWriter pw = response.getWriter();
-//      pw.write("error accured");
-	
 	}
 }

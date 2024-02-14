@@ -11,17 +11,10 @@ import lombok.Data;
 
 @Data
 public class ShowOffInfoDTO extends AbstractEntity{
-
 	private ShowOffJpa showOffjpa;
-	
 	private List<ShowOffAttachJpa> showOffAttachJpaList;
-	
 	private List<String> fileAttachList;
-	
 	private ShowOffReplyJpa showOffReplyJpa;
-	
 	private long mbrSeq;
-	
 	private long showOffSeq;
-	
 }

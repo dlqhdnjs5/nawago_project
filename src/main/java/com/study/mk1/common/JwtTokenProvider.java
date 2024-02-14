@@ -33,7 +33,6 @@ public class JwtTokenProvider {
 	private String SECRETKEY;
 	private long EXPIRATION_MS = 1000 * 60 * 60 ;
 
-	private final UserDetailsService userDetailsService;
 	private final SecurityUserDetailService securityUserDetailService;
 	private final MbrJpaRepository mbrJpaRepository;
 	private final GlobalPropertySource gp;
@@ -60,22 +59,12 @@ public class JwtTokenProvider {
 		UserDetails userDetails = securityUserDetailService.loadUserByUsername(this.getUserPk(token));
 		return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
 	}
-	
-	public Authentication getAuthenticationById(String id) {
-		UserDetails userDetails = securityUserDetailService.loadUserByUsername(id);
-		return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
-	}
 
 	public String getUserPk(String token) {
 		return Jwts.parser().setSigningKey(SECRETKEY).parseClaimsJws(token).getBody().getSubject();
 	}
 	
 	public MbrJpa getUserInfo(String token) {
-		String mbrId = Jwts.parser().setSigningKey(SECRETKEY).parseClaimsJws(token).getBody().getSubject();
-		return  mbrJpaRepository.findByMbrId(mbrId);
-	}
-	
-	public MbrJpa getFamilyInfo(String token) {
 		String mbrId = Jwts.parser().setSigningKey(SECRETKEY).parseClaimsJws(token).getBody().getSubject();
 		return  mbrJpaRepository.findByMbrId(mbrId);
 	}

@@ -6,11 +6,8 @@ import lombok.Data;
 
 @Data
 public class Auth extends AbstractEntity{
-	
 	private int authSeq;
-	
 	private String authCd;
-	
 	private String authNm;
 	
 }

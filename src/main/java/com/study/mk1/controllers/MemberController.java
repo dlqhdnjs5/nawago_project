@@ -1,17 +1,13 @@
 package com.study.mk1.controllers;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -24,8 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.amazonaws.AmazonServiceException;
-import com.amazonaws.SdkClientException;
 import com.study.mk1.cmp.components.MbrComponent;
 import com.study.mk1.common.IOService;
 import com.study.mk1.common.JwtTokenProvider;
@@ -36,7 +30,6 @@ import com.study.mk1.data.MbrInfoResult;
 import com.study.mk1.data.PetInfoDTO;
 import com.study.mk1.jpa.mbr.MbrJpa;
 import com.study.mk1.jpa.mbr.MbrJpaCustomRepository;
-import com.study.mk1.jpa.mbr.MbrJpaRepository;
 import com.study.mk1.jpa.mbrPetMapping.MbrPetMappingJpa;
 import com.study.mk1.jpa.pet.PetJpa;
 
@@ -48,6 +41,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @RequestMapping("/api/member")
 public class MemberController {
+	private static final String NAWAGO_PROFILE_PATH = "nawago/myPage/profile/";
+
 	private final S3service s3service;
 	private final IOService ioService;
 	private final JwtTokenProvider jwtTokenProvider;
@@ -62,14 +57,24 @@ public class MemberController {
 	
 	@PostMapping(value="/isExistMbrInfo")
 	@ResponseBody
-	public String isExistMbrInfo(@RequestBody MbrInfoDTO mbrInfoDto) throws Exception {
-		return mbrComponent.isExistMbrInfo(mbrInfoDto);
+	public String isExistMbrInfo(@RequestBody MbrInfoDTO mbrInfoDto) {
+		try {
+			return mbrComponent.isExistMbrInfoForUpdate(mbrInfoDto);
+		} catch (Exception exception) {
+			log.error("error occurred while get isExistMbrInfo. MbrInfoDTO: {}", mbrInfoDto, exception);
+			throw new RuntimeException(exception);
+		}
 	}
 	
 	@PostMapping(value="/isExistMbrInfoForUpdate")
 	@ResponseBody
-	public String isExistMbrInfoForUpdate(@RequestBody MbrInfoDTO mbrInfoDto) throws Exception {
-		return mbrComponent.isExistMbrInfoForUpdate(mbrInfoDto);
+	public String isExistMbrInfoForUpdate(@RequestBody MbrInfoDTO mbrInfoDto) {
+		try {
+			return mbrComponent.isExistMbrInfoForUpdate(mbrInfoDto);
+		} catch (Exception exception) {
+			log.error("error occurred while get isExistMbrInfoForUpdate. MbrInfoDTO: {}", mbrInfoDto, exception);
+			throw new RuntimeException(exception);
+		}
 	}
 	
 	@PostMapping("/file/upload") 
@@ -86,23 +91,20 @@ public class MemberController {
 			return new ResponseEntity<Object>(HttpStatus.BAD_REQUEST);
 		}
 
-		String path = s3service.uploadWithRandomFileNm(multipartFile,"nawago/myPage/profile/");
+		String path = s3service.uploadWithRandomFileNm(multipartFile,NAWAGO_PROFILE_PATH);
 
 		return new ResponseEntity<Object>(path,HttpStatus.OK);
 	}
 	
 	@PostMapping("/file/delete") 
-	@ResponseBody public void delete(@RequestBody PetInfoDTO dto) throws IOException {
-		
+	@ResponseBody public void delete(@RequestBody PetInfoDTO petInfoDTO) {
 		try {
-			String filePath = "nawago/myPage/profile/"+dto.getFileName().toString();
+			String filePath = NAWAGO_PROFILE_PATH + petInfoDTO.getFileName().toString();
 			s3service.delete(filePath);
-		} catch (AmazonServiceException e) {
-            e.printStackTrace();
-        } catch (SdkClientException e) {
-            e.printStackTrace();
-        }
-		
+		} catch (Exception exception) {
+			log.error("error occurred while update profilePhoto PetInfoDTO: {}", petInfoDTO, exception);
+			throw new RuntimeException(exception);
+		}
 	}
 	
 	@PostMapping("/update/profilePhoto")
@@ -158,12 +160,9 @@ public class MemberController {
 			reulstList.setPetJpaList(pet);
 			
 			return new ResponseEntity<MbrInfoResult>(reulstList, HttpStatus.OK);
-			
-		}catch(Exception e) {
+		} catch (Exception e) {
+			log.error("error occurred while getUserInfo  userId: {}", userId, e);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		
 	}
-	
-	
 }

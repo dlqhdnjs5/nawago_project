@@ -5,10 +5,7 @@ import com.study.mk1.abstracts.AbstractEntity;
 import lombok.Data;
 
 @Data
-public class MbrPetMappingId extends AbstractEntity{
-
+public class MbrPetMappingId extends AbstractEntity {
 	long mbrSeq;
-	
 	long petSeq;
-	
 }

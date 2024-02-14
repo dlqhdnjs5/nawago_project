@@ -20,69 +20,55 @@ public class SecurityUserDetails implements UserDetails {
 
 	
 	/**
-	 * mybatis 사용
+	 * mybatis
 	 */
 	Mbr mbr;
 	Auth authField;
 	
 	/**
-	 * jpa 사용
+	 * jpa
 	 */
 	MbrJpa mbrJpa;
 	AuthJpa authJpa;
     
 	private String type;
-	
-	 /* 권한 파라미터 리스트*/
     List<GrantedAuthority> grantedAuths;
-    
     
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		// TODO Auto-generated method stub
 		ArrayList<GrantedAuthority> auth = new ArrayList<GrantedAuthority>();
-		/*jpa 와 mybatis 구분*/
-		if(mbr != null && authField != null) {
+		if (mbr != null && authField != null) {
 			auth.add(new SimpleGrantedAuthority(authField.getAuthCd()));
-		}else if(mbrJpa != null && authJpa != null) {
+		} else if(mbrJpa != null && authJpa != null) {
 			auth.add(new SimpleGrantedAuthority(authJpa.getAuthCd()));
 		}
 		
 		grantedAuths = (List<GrantedAuthority>) auth.clone();
-		
 		this.setType();
-		
 		return auth;
 	}
 	@Override
 	public String getPassword() {
-		// TODO Auto-generated method stub
 		return type.equals(approchType.MYBATIS.toString()) ?  mbr.getMbrPw() : mbrJpa.getMbrPw();
-		//return mbr.getMbrPw();
 	}
 	@Override
 	public String getUsername() {
-		// TODO Auto-generated method stub
 		return type.equals(approchType.MYBATIS.toString()) ?  mbr.getMbrId() : mbrJpa.getMbrId();
 	}
 	@Override
 	public boolean isAccountNonExpired() {
-		// TODO Auto-generated method stub
 		return true;
 	}
 	@Override
 	public boolean isAccountNonLocked() {
-		// TODO Auto-generated method stub
 		return true;
 	}
 	@Override
 	public boolean isCredentialsNonExpired() {
-		// TODO Auto-generated method stub
 		return true;
 	}
 	@Override
 	public boolean isEnabled() {
-		// TODO Auto-generated method stub
 		return true;
 	}
 	

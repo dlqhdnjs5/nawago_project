@@ -44,6 +44,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/pet")
 @RequiredArgsConstructor
 public class PetController {
+	private final static String PET_INFO_PATH = "nawago/pet/petInfo/";
+
 	private final S3service s3service;
 	private final JwtTokenProvider jwtTokenProvider;
 	private final PetComponent petComponent;
@@ -52,8 +54,14 @@ public class PetController {
 	
 	
 	@PostMapping("/file/upload") 
-	@ResponseBody public String upload(@RequestParam("data") MultipartFile multipartFile) throws IOException { 
-		return s3service.uploadWithRandomFileNm(multipartFile,"nawago/pet/petInfo/");
+	@ResponseBody public String upload(@RequestParam("data") MultipartFile multipartFile) {
+		try {
+			return s3service.uploadWithRandomFileNm(multipartFile,PET_INFO_PATH);
+		} catch (Exception exception) {
+			log.error("error occurred while file upload.", exception);
+			throw new RuntimeException(exception);
+		}
+
 	}
 	
 	
@@ -71,22 +79,28 @@ public class PetController {
 
 	@PostMapping("/registPet") 
 	@ResponseBody
-	public ResponseEntity<Object> registPet( HttpServletRequest req, @RequestBody PetInfoDTO dto) throws Exception {
-		String token = req.getHeader("x-auth");
-		if(StringUtils.isEmpty(token)) {
-			return new ResponseEntity<Object>(HttpStatus.UNAUTHORIZED);
-    	}
+	public ResponseEntity<Object> registPet( HttpServletRequest req, @RequestBody PetInfoDTO dto) {
+		try {
+			String token = req.getHeader("x-auth");
 
-		boolean tokenValidYn = jwtTokenProvider.validateToken(token);
-		if(!tokenValidYn) return new ResponseEntity<Object>(HttpStatus.UNAUTHORIZED);
+			if(StringUtils.isEmpty(token)) {
+				return new ResponseEntity<Object>(HttpStatus.UNAUTHORIZED);
+			}
 
-		MbrJpa mbr = jwtTokenProvider.getUserInfo(token);
-		dto.setMbrJpa(mbr);
-		dto.getPetJpa().setPetIntro(XSSUtill.stripXSS(dto.getPetJpa().getPetIntro()));
-		dto.getPetJpa().setPetNm(XSSUtill.stripXSS(dto.getPetJpa().getPetNm()));
-		petComponent.registPet(dto);
+			boolean tokenValidYn = jwtTokenProvider.validateToken(token);
+			if(!tokenValidYn) return new ResponseEntity<Object>(HttpStatus.UNAUTHORIZED);
 
-		return new ResponseEntity<Object>(HttpStatus.OK);
+			MbrJpa mbr = jwtTokenProvider.getUserInfo(token);
+			dto.setMbrJpa(mbr);
+			dto.getPetJpa().setPetIntro(XSSUtill.stripXSS(dto.getPetJpa().getPetIntro()));
+			dto.getPetJpa().setPetNm(XSSUtill.stripXSS(dto.getPetJpa().getPetNm()));
+			petComponent.registPet(dto);
+		} catch (RuntimeException exception) {
+			log.error("error occurred while registPet. PetInfoDTO: {}", dto, exception);
+			throw exception;
+		}
+
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	@GetMapping("/getPetInfo")
@@ -99,7 +113,7 @@ public class PetController {
 				return new ResponseEntity<>(null,HttpStatus.OK);
 			}
 			
-			return new ResponseEntity<PetJpa>(petJpa,HttpStatus.OK);
+			return new ResponseEntity<>(petJpa,HttpStatus.OK);
 		} catch(RuntimeException runtimeException) {
 			log.error("error occurred while getPetInfo. petSeq : {}", petSeq, runtimeException);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

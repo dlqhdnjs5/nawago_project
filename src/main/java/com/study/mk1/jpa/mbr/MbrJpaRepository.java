@@ -7,10 +7,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MbrJpaRepository extends JpaRepository<MbrJpa, Long>{
-	
 	MbrJpa findByMbrId(String mbrId);
-	
-	MbrJpa findByMbrSeq(long mbrSeq);
 
 	long countByMbrId(String mbrId);
 	

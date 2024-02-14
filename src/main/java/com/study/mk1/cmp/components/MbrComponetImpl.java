@@ -44,7 +44,7 @@ public class MbrComponetImpl implements MbrComponent {
 	}
 	
 	@Override
-	public String isExistMbrInfoForUpdate(MbrInfoDTO mbrInfoDto) throws Exception {
+	public String isExistMbrInfoForUpdate(MbrInfoDTO mbrInfoDto) {
 		long mbrSeq = mbrInfoDto.getMbrSeq();
 		String bfMbrEmail = mbrInfoDto.getBfMbrEmail();
 		String bfMbrNickNm = mbrInfoDto.getBfMbrNickNm();

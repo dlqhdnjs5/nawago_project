@@ -24,11 +24,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.study.mk1.cmp.repositorys.MbrRepository;
 import com.study.mk1.common.IOService;
 import com.study.mk1.common.JwtTokenProvider;
-import com.study.mk1.common.S3service;
-import com.study.mk1.config.GlobalPropertySource;
 import com.study.mk1.data.MbrInfoDTO;
 import com.study.mk1.enums.MbrEnum;
 import com.study.mk1.jpa.mbr.MbrJpa;
@@ -53,11 +50,6 @@ public class DefaultController {
 	private final PasswordEncoder passwordEncoder;
 	private final JwtTokenProvider jwtTokenProvider;
 
-	/**
-	 * 로그인
-	 * @param user
-	 * @return
-	 */
     @PostMapping("/loginProcesse")
     @ResponseBody
     public ResponseEntity<String> login(@RequestBody Map<String, String> user) {
@@ -84,12 +76,6 @@ public class DefaultController {
 
     }
     
-    /**
-     * 유저 기본 정보 조회
-     * @param req
-     * @param rs
-     * @return
-     */
     @GetMapping("/getMbrInfo")
     @ResponseBody
     public ResponseEntity<Object> getMbrInfo(HttpServletRequest req, HttpServletResponse rs) {
@@ -177,7 +163,6 @@ public class DefaultController {
 		return new ResponseEntity<String>(key,HttpStatus.OK);
 	}
 	
-	
 	private  String getRandomStr(int size) {
 		char[] tmp = new char[size];
 		for(int i=0; i<tmp.length; i++) {
@@ -191,5 +176,4 @@ public class DefaultController {
 		}
 		return new String(tmp);
 	}
-
 }

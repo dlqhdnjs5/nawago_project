@@ -11,6 +11,5 @@ public class SessionListener implements HttpSessionListener {
 
 	@Override
 	public void sessionDestroyed(HttpSessionEvent se) {
-
 	}
 }

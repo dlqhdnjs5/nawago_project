@@ -1,17 +1,11 @@
 package com.study.mk1.interfaces;
 
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -98,7 +92,8 @@ public class AbandonedPetApiController {
         	log.error("error occured while getAbandonedPetInfo", exception);
         	return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<List<AbandonedPetDTO>>(abandonedPetDTOList,HttpStatus.OK);
+
+        return new ResponseEntity<>(abandonedPetDTOList, HttpStatus.OK);
 	}
 	
 	private static String getTagValue(String tag, Element eElement) {
@@ -113,5 +108,4 @@ public class AbandonedPetApiController {
 	    if (nValue == null)  return null;
 	    return nValue.getNodeValue();
 	}
-
 }

@@ -3,7 +3,6 @@ package com.study.mk1.cmp.services;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.study.mk1.cmp.repositorys.AuthRepository;
 import com.study.mk1.data.MbrInfoDTO;
 import com.study.mk1.jpa.mbr.MbrJpa;
 import com.study.mk1.jpa.mbr.MbrJpaCustomRepository;
@@ -18,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class MbrService {
-	private final AuthRepository authRepository;
 	private final MbrJpaRepository MbrJpaRepository;
 	private final MbrJpaCustomRepository mbrJpaCustomRepository;
 	private final MbrAuthMappingJpaRepository mbrAuthMappingJpaRepository;

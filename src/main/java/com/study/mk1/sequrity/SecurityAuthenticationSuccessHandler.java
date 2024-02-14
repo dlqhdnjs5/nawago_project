@@ -22,9 +22,6 @@ import com.study.mk1.data.SecurityResult;
 @Component
 public class SecurityAuthenticationSuccessHandler extends  SimpleUrlAuthenticationSuccessHandler{
 	
-	/**
-	 * 로그인이 성공하고나서 로직
-	 */
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws ServletException, IOException {
@@ -42,41 +39,14 @@ public class SecurityAuthenticationSuccessHandler extends  SimpleUrlAuthenticati
     	}else {
     		securityResult.setPrevPage(getReturnUrl(request,response));
     	}
-    	
-    	
+
     	response.setCharacterEncoding("UTF-8");
     	response.setContentType("text/plain");
         response.setStatus(HttpServletResponse.SC_OK);
         response.getWriter().print(mapper.writeValueAsString(securityResult));
         response.getWriter().flush();
     }
-	
-	/*@Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, 
-        Authentication authentication) throws ServletException, IOException {
-        
-        HttpSession session = request.getSession();
-        if (session != null) {
-            String redirectUrl = (String) session.getAttribute("prevPage");
-            if (redirectUrl != null) {
-                session.removeAttribute("prevPage");
-                getRedirectStrategy().sendRedirect(request, response, redirectUrl);
-            } else {
-                super.onAuthenticationSuccess(request, response, authentication);
-            }
-        } else {
-            super.onAuthenticationSuccess(request, response, authentication);
-        }
-    }*/
 
-
-   
-   /**
-    * 로그인 전의 URL 조회
-    * @param request
-    * @param response
-    * @return
-    */
    private String getReturnUrl(HttpServletRequest request, HttpServletResponse response) {
 		RequestCache requestCache = new HttpSessionRequestCache();
 		SavedRequest savedRequest = requestCache.getRequest(request, response);

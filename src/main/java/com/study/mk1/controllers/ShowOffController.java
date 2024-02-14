@@ -55,7 +55,6 @@ public class ShowOffController {
 	@ResponseBody
 	public List<ShowOffResult> getShowOffList(HttpServletRequest req, Pageable pageable) {
 		MbrJpa mbr  = ioService.getMbrInfoByRequest(req);
-
 		long mbrSeq;
 		if(mbr == null) {
 			mbrSeq = 0;
@@ -63,19 +62,13 @@ public class ShowOffController {
 			mbrSeq = mbr.getMbrSeq();
 		}
 		
-		return showOffJpaCustomRepository.findByShowOffPagingV2(mbrSeq,pageable);
+		return showOffJpaCustomRepository.findByShowOffPagingV2(mbrSeq, pageable);
 	}
 	
-	
-	/**
-	 * 스토리 미디어 파일 s3 저장
-	 */
-	@PostMapping("/file/upload") 
-	@ResponseBody public ResponseEntity<Object> upload( HttpServletRequest req,HttpServletResponse res,
-			@RequestParam("data") MultipartFile multipartFile) throws IOException { 
-		
+	@PostMapping("/file/upload")
+	@ResponseBody public ResponseEntity<Object> upload( HttpServletRequest req,	@RequestParam("data") MultipartFile multipartFile) throws IOException {
 		try {
-			if(!ioService.hasRoleByRequest(req))return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+			if (!ioService.hasRoleByRequest(req)) return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		} catch (Exception e) {
 			log.error(this.getClass()+".upload 401");
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -84,168 +77,123 @@ public class ShowOffController {
 		SimpleDateFormat format1 = new SimpleDateFormat ("yyyy-MM-dd");
 		Date time = new Date();
 		String time1 = format1.format(time);
-		
 		String path = s3service.uploadWithRandomFileNm(multipartFile,"nawago/showOff/"+time1+"/");
 		
 		return  new ResponseEntity<Object>(path,HttpStatus.OK);
 		
 	}
 	
-	/**
-	 * 스토리 저장
-	 */
 	@PostMapping("/add")
 	@ResponseBody
-	public ResponseEntity<String> addShowOff( @RequestBody ShowOffInfoDTO dto,HttpServletRequest req,HttpServletResponse res) {
-		
-		
+	public ResponseEntity<String> addShowOff(@RequestBody ShowOffInfoDTO showOffInfoDTO ,HttpServletRequest req) {
 		try {
-			
 			MbrJpa mbr  = ioService.getMbrInfoByRequest(req);
 			if(mbr == null)return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 			
-			//showOff setting
-			dto.getShowOffjpa().setMbrSeq(mbr.getMbrSeq());
-			dto.getShowOffjpa().setShowOffStatCd(ShowOffEnum.StatCd.ACT.toString());
-			dto.getShowOffjpa().setShowOffTpCd(ShowOffEnum.Tpcd.GNRL.toString());
-			dto.getShowOffjpa().setShowOffCont(XSSUtill.stripXSS(dto.getShowOffjpa().getShowOffCont()));
-			//showOffAttach setting
+			showOffInfoDTO.getShowOffjpa().setMbrSeq(mbr.getMbrSeq());
+			showOffInfoDTO.getShowOffjpa().setShowOffStatCd(ShowOffEnum.StatCd.ACT.toString());
+			showOffInfoDTO.getShowOffjpa().setShowOffTpCd(ShowOffEnum.Tpcd.GNRL.toString());
+			showOffInfoDTO.getShowOffjpa().setShowOffCont(XSSUtill.stripXSS(showOffInfoDTO.getShowOffjpa().getShowOffCont()));
+
 			List<ShowOffAttachJpa> attachList = new ArrayList<>();
 			
-			for(String contentsUrl :  dto.getFileAttachList()) {
+			for(String contentsUrl :  showOffInfoDTO.getFileAttachList()) {
 				ShowOffAttachJpa obj = new ShowOffAttachJpa();
 				obj.setShowOffAttachUrl(ioService.getFileUrl(contentsUrl));
 				obj.setShowOffAttachNm(ioService.getFileNm(contentsUrl));
 				obj.setShowOffAttachTpCd(ioService.getFileTpCd(contentsUrl));
 				attachList.add(obj);
 			}
-			dto.setShowOffAttachJpaList(attachList);
+
+			showOffInfoDTO.setShowOffAttachJpaList(attachList);
 			
-			showOffComponent.addShowOff(dto);
-			
-		}catch(Exception e) {
-			throw new RuntimeException();
+			showOffComponent.addShowOff(showOffInfoDTO);
+		} catch (Exception exception) {
+			log.error("error occurred while addShowOff. showOffInfoDTO : {}", showOffInfoDTO, exception);
+			throw new RuntimeException(exception);
 		}
 		
 		return  new ResponseEntity<String>(HttpStatus.OK);
 	}
 	
-	/**
-	 * 마이페이지 스토리 목록 조회
-	 */
 	@GetMapping("/getMyShowOffList")
 	@ResponseBody
-	public ResponseEntity<List<ShowOffResult>> getMyShowOffList( HttpServletRequest req,HttpServletResponse res,
-			 @RequestParam(value="params") String mbrSeq, Pageable pageable ) {
-		
+	public ResponseEntity<List<ShowOffResult>> getMyShowOffList(@RequestParam(value="params") String mbrSeq, Pageable pageable ) {
 		try {
 			List<ShowOffResult> list = showOffJpaCustomRepository.findByMbrSeqPagingV2(Long.parseLong(mbrSeq),pageable);
 			return new ResponseEntity<List<ShowOffResult>>(list,HttpStatus.OK);
-		}catch(Exception e) {
-			log.info(this.getClass()+".getMyShowOffList() [ERROR] --> mbrSeq : {}",mbrSeq); 
+		} catch (Exception exception) {
+			log.error("error occurred while getMyShowOffList. mbrSeq : {}", mbrSeq, exception);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		
-		
 	}
 	
 	@GetMapping("/getShowOffReplyList")
 	@ResponseBody
-	public ResponseEntity<List<ShowOffReplyJpa>> getShowOffReplyList( HttpServletRequest req,HttpServletResponse res,
-			 @RequestParam(value="showOffSeq") String showOffSeq ) {
+	public ResponseEntity<List<ShowOffReplyJpa>> getShowOffReplyList(@RequestParam(value="showOffSeq") String showOffSeq ) {
 		try {
 			List<ShowOffReplyJpa> list = showOffJpaCustomRepository.showOffReplyfindByMbrSeq(Long.parseLong(showOffSeq));
 			return new ResponseEntity<List<ShowOffReplyJpa>>(list,HttpStatus.OK);
-		
-		
-		}catch(Exception e) {
-			log.info(this.getClass()+".getMyShowOffList() [ERROR] --> mbrSeq : {}",showOffSeq); 
+		} catch (Exception exception) {
+			log.error("error occurred while addShowOff. showOffSeq : {}", showOffSeq, exception);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		
-		
 	}
-	
-	/**
-	 * 스토리 댓글 저장
-	 */
+
 	@PostMapping("/addShowOffReply")
 	@ResponseBody
-	public ResponseEntity<Long> addShowOffReply(HttpServletRequest req,HttpServletResponse res, @RequestBody ShowOffInfoDTO dto) {
-		MbrJpa mbrJpa = new MbrJpa();
+	public ResponseEntity<Long> addShowOffReply(HttpServletRequest req, @RequestBody ShowOffInfoDTO showOffInfoDTO) {
+		MbrJpa mbrJpa;
 		long showOffReplyCnt;
 		try {
-			
 			mbrJpa = ioService.getMbrInfoByRequest(req);
 			if(mbrJpa == null)return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-			
-			dto.getShowOffReplyJpa().setReplyCont(XSSUtill.stripXSS(dto.getShowOffReplyJpa().getReplyCont()));
-			if("".equals(dto.getShowOffReplyJpa().getReplyCont()) || StringUtils.isEmpty(dto.getShowOffReplyJpa().getReplyCont()) ) {
+
+			showOffInfoDTO.getShowOffReplyJpa().setReplyCont(XSSUtill.stripXSS(showOffInfoDTO.getShowOffReplyJpa().getReplyCont()));
+			if("".equals(showOffInfoDTO.getShowOffReplyJpa().getReplyCont()) || StringUtils.isEmpty(showOffInfoDTO.getShowOffReplyJpa().getReplyCont()) ) {
 				throw new Exception();
 			}
-			dto.getShowOffReplyJpa().setMbrSeq(mbrJpa.getMbrSeq());
-			dto.getShowOffReplyJpa().setRegterId(mbrJpa.getMbrId());
+			showOffInfoDTO.getShowOffReplyJpa().setMbrSeq(mbrJpa.getMbrSeq());
+			showOffInfoDTO.getShowOffReplyJpa().setRegterId(mbrJpa.getMbrId());
 			
 		
-			showOffReplyCnt = showOffComponent.addShowOffReply(dto);
-			
-		} catch (Exception e) {
+			showOffReplyCnt = showOffComponent.addShowOffReply(showOffInfoDTO);
+		} catch (Exception exception) {
+			log.error("error occurred while addShowOffReply. showOffInfoDTO : {}", showOffInfoDTO, exception);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-			// TODO Auto-generated catch block
 		}
 		
-		return new ResponseEntity<Long>(showOffReplyCnt,HttpStatus.OK);
+		return new ResponseEntity<>(showOffReplyCnt,HttpStatus.OK);
 	}
 	
-	
-	/**
-	 * 좋아요 버튼 update
-	 * @param req
-	 * @param res
-	 * @param dto
-	 * @return
-	 */
 	@PostMapping("/updateShowOffLike")
 	@ResponseBody
-	public ResponseEntity<Long> updateShowOffLike(HttpServletRequest req,HttpServletResponse res, @RequestBody ShowOffLikeJpa dto) {
-		
-		MbrJpa mbrJpa = new MbrJpa();
-		long likeCnt;
+	public ResponseEntity<Long> updateShowOffLike(HttpServletRequest req, @RequestBody ShowOffLikeJpa showOffLikeJpa) {
+		MbrJpa mbrJpa;
+		long likeCnt = 0;
 		try {
-			
 			mbrJpa = ioService.getMbrInfoByRequest(req);
 			if(mbrJpa == null)return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+
+			showOffLikeJpa.setMbrSeq(mbrJpa.getMbrSeq());
+			likeCnt = showOffComponent.updateShowOffLike(showOffLikeJpa);
 			
-			dto.setMbrSeq(mbrJpa.getMbrSeq());
-			likeCnt = showOffComponent.updateShowOffLike(dto);
-			
-		} catch (Exception e) {
+		} catch (Exception exception) {
+			log.error("error occurred while addShowOffReply. showOffInfoDTO : {}", showOffLikeJpa, exception);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-			// TODO Auto-generated catch block
 		}
 		
 		return new ResponseEntity<Long>(likeCnt,HttpStatus.OK);
 	}
 	
-	/**
-	 * 스토리 삭제
-	 * @param req
-	 * @param res
-	 * @param dto
-	 * @return
-	 */
 	@PostMapping("/deleteShowOff")
 	@ResponseBody
-	public ResponseEntity<Object> deleteShowOff(HttpServletRequest req,HttpServletResponse res, @RequestBody ShowOffInfoDTO dto) {
-		
-		MbrJpa mbrJpa = new MbrJpa();
+	public ResponseEntity<Object> deleteShowOff(@RequestBody ShowOffInfoDTO showOffInfoDTO) {
 		try {
-			
-			showOffComponent.deleteShowOff(dto);
-			
-		} catch (Exception e) {
+			showOffComponent.deleteShowOff(showOffInfoDTO);
+		} catch (Exception exception) {
+			log.error("error occurred while addShowOffReply. showOffInfoDTO : {}", showOffInfoDTO, exception);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-			// TODO Auto-generated catch block
 		}
 		
 		return new ResponseEntity<>(HttpStatus.OK);
