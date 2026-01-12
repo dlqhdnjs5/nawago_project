@@ -14,15 +14,42 @@
 ## 인원
 이보원 : 전체적인 개발 및 구성 
 
-### 개발 환경
+### Nawago 프로젝트 — 개요 & 기술 경험
 
-* 호스팅 : AWS (AM, EC2, RDS, S3, ROUTE 53)
-* Frontend : Vuejs, Vuex, Vuetify
-* Backend : SpringBoot, JAVA, JPA, QueryDSL, MyBatis,
-* Security : JWT, SpringSecurity
-* Database : mariaDB
-* 배포환경 : LINUX(Ubuntu) ,node.js, tomcat, GIT, maven,
-* 도메인 : 가비아 서비스 활용
+“Nawago (나에게 와줘서 고마워)”는 공공 OPEN API 기반 유기동물 현황 공유 서비스로, 동물 보호·입양 정보를 시의성 있게 제공하며 사용자 간 소통까지 포함하는 웹 서비스입니다. 이 프로젝트는 개인 학습용 레퍼런스로 시작했지만, 웹/백엔드 전반을 설계·구현하면서 실제 서비스 구조의 고민과 운영 관점을 경험할 수 있었던 실전 프로젝트입니다.
+
+이 프로젝트의 핵심은 실시간 데이터 연계 + 보안성 고려 + 배포 및 운영 환경 구성이며, 직접 전체 스택을 구현함으로써 프론트엔드부터 백엔드까지의 서비스 개발 전 과정을 경험했습니다.
+
+### 프로젝트 목적
+
+현행 유기 동물 정보는 여러 공공 API에 흩어져 있으며, 이를 하나의 사용자 친화적 인터페이스로 통합 제공하여 사용자들이 쉽게 정보에 접근하고 공유할 수 있는 플랫폼을 구축하는 것이 목표였습니다.
+
+### 사용 기술 & 아키텍처
+
+**Frontend**: Vue.js 기반 단일 페이지 애플리케이션으로 사용자 친화적 UI/UX 구성
+
+**Backend**: Spring Boot, Java 기반 RESTful API 서버
+
+**DB & Persistence**: MariaDB + JPA/MyBatis 이용한 안정적인 데이터 저장 및 조회
+
+**보안**: JWT 기반 인증 및 Spring Security 적용
+
+**호스팅 & 배포 & 운영**: AWS EC2, RDS, S3, Route53 기반 실제 도메인 배포 환경 구성
+
+**환경**: Linux (Ubuntu) 서버 환경, Maven 빌드 시스템
+
+**주요 경험 & 기술적 배움**
+
+Frontend-Backend 분리 아키텍처로 실제 SPA 웹 앱 구현 경험
+
+보안 토큰 기반 인증 시스템(JWT) 설계·적용
+
+RESTful API 설계 패턴 중심 코드 구성 경험
+
+클라우드 인프라 환경을 직접 구성하고 서비스 배포하는 실전 경험
+
+개발과 운영의 분리된 사이클을 이해하고, 배포 자동화/환경 의존성을 줄이는 설계 방향 체득
+
 
 ## 서버 구성
 ![image](https://github.com/dlqhdnjs5/nawago_project/assets/73633754/8887528b-e5f2-49cf-a606-3679d18c07d4)
