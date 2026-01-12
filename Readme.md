@@ -38,7 +38,7 @@
 
 **환경**: Linux (Ubuntu) 서버 환경, Maven 빌드 시스템
 
-**주요 경험 & 기술적 배움**
+### 주요 경험 & 기술적 배움
 
 Frontend-Backend 분리 아키텍처로 실제 SPA 웹 앱 구현 경험
 
